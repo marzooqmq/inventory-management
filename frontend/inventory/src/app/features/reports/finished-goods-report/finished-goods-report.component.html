@@ -1,0 +1,123 @@
+﻿<div class="report-container">
+
+  <div class="page-header">
+    <div class="page-header-left">
+      <h1 class="page-title">Finished Goods Report</h1>
+      <p class="page-sub">View production output of finished goods by product and date</p>
+    </div>
+  </div>
+
+  <!-- Filter Card -->
+  <div class="filter-card">
+    <div class="filter-grid">
+      <div class="filter-item">
+        <label class="filter-label">Start Date</label>
+        <p-calendar [(ngModel)]="startDate" dateFormat="yy-mm-dd" [showIcon]="true" placeholder="YYYY-MM-DD" styleClass="rpt-calendar" appendTo="body" />
+      </div>
+      <div class="filter-item">
+        <label class="filter-label">End Date</label>
+        <p-calendar [(ngModel)]="endDate" dateFormat="yy-mm-dd" [showIcon]="true" placeholder="YYYY-MM-DD" styleClass="rpt-calendar" appendTo="body" />
+      </div>
+      <div class="filter-item">
+        <label class="filter-label">Product</label>
+        <p-dropdown [options]="productOptions" [(ngModel)]="selectedProductId" optionLabel="label" optionValue="value" styleClass="rpt-dropdown" appendTo="body" [filter]="true" filterPlaceholder="Search product" placeholder="All Products" />
+      </div>
+      <div class="filter-actions">
+        <button class="btn-primary" (click)="onApplyFilters()">
+          <i class="pi pi-search"></i> Apply
+        </button>
+        <button class="btn-ghost" (click)="onClearFilters()">
+          <i class="pi pi-times"></i> Clear
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="kpi-row" *ngIf="response && !loading">
+    <div class="kpi-card kpi-violet">
+      <div class="kpi-icon"><i class="pi pi-tags"></i></div>
+      <div class="kpi-body">
+        <div class="kpi-label">Total Products</div>
+        <div class="kpi-value">{{ response.totalProducts }}</div>
+      </div>
+    </div>
+    <div class="kpi-card kpi-cyan kpi-highlight">
+      <div class="kpi-icon"><i class="pi pi-box"></i></div>
+      <div class="kpi-body">
+        <div class="kpi-label">Total Boxes Produced</div>
+        <div class="kpi-value">{{ response.totalBoxesProduced | number }}</div>
+      </div>
+    </div>
+    <div class="kpi-card kpi-blue">
+      <div class="kpi-icon"><i class="pi pi-th-large"></i></div>
+      <div class="kpi-body">
+        <div class="kpi-label">Total Loose Pads</div>
+        <div class="kpi-value">{{ response.totalLoosePadsProduced | number }}</div>
+      </div>
+    </div>
+    <div class="kpi-card kpi-slate">
+      <div class="kpi-icon"><i class="pi pi-file"></i></div>
+      <div class="kpi-body">
+        <div class="kpi-label">Total Records</div>
+        <div class="kpi-value">{{ response.totalRecords | number }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="table-card">
+    <div class="table-info-bar">
+      <span class="record-count" *ngIf="response">
+        {{ response.totalRecords }} record(s) &nbsp;·&nbsp; Page {{ page + 1 }} of {{ response.totalPages }}
+      </span>
+      <span class="record-count" *ngIf="!response && !loading">No data</span>
+    </div>
+    <div class="table-scroll-wrapper">
+      <table class="rpt-table">
+        <thead>
+          <tr>
+            <th class="th-sno">S.NO</th>
+            <th>PRODUCT</th>
+            <th class="th-right">BOXES PRODUCED</th>
+            <th class="th-right">LOOSE PADS</th>
+            <th class="th-center">PRODUCTION DATE</th>
+          </tr>
+        </thead>
+        <tbody>
+          <ng-container *ngIf="loading">
+            <tr class="skeleton-row" *ngFor="let s of [1,2,3,4,5,6,7,8]">
+              <td *ngFor="let c of [1,2,3,4,5]"><p-skeleton height="1rem" /></td>
+            </tr>
+          </ng-container>
+          <ng-container *ngIf="!loading">
+            <tr *ngFor="let row of records; let i = index">
+              <td class="td-sno td-center">{{ page * pageSize + i + 1 }}</td>
+              <td class="td-primary-text">{{ row.productName }}</td>
+              <td class="td-right td-num td-blue td-bold">{{ row.boxesProduced | number }}</td>
+              <td class="td-right td-num">{{ row.loosePadsProduced | number }}</td>
+              <td class="td-center td-date">{{ formatDate(row.productionDate) }}</td>
+            </tr>
+            <tr *ngIf="records.length === 0">
+              <td colspan="5">
+                <div class="empty-state">
+                  <div class="empty-icon"><i class="pi pi-inbox"></i></div>
+                  <div class="empty-title">No finished goods records found</div>
+                  <div class="empty-sub">Adjust filters and try again</div>
+                </div>
+              </td>
+            </tr>
+          </ng-container>
+        </tbody>
+      </table>
+    </div>
+    <div class="pagination-bar" *ngIf="pages.length > 1">
+      <button class="page-btn" [disabled]="page === 0" (click)="goToPage(0)"><i class="pi pi-angle-double-left"></i></button>
+      <button class="page-btn" [disabled]="page === 0" (click)="goToPage(page - 1)"><i class="pi pi-angle-left"></i></button>
+      <button *ngFor="let p of pages" class="page-btn" [class.page-active]="p === page" (click)="goToPage(p)">{{ p + 1 }}</button>
+      <button class="page-btn" [disabled]="page === (pages.length - 1)" (click)="goToPage(page + 1)"><i class="pi pi-angle-right"></i></button>
+      <button class="page-btn" [disabled]="page === (pages.length - 1)" (click)="goToPage(pages.length - 1)"><i class="pi pi-angle-double-right"></i></button>
+    </div>
+  </div>
+
+</div>

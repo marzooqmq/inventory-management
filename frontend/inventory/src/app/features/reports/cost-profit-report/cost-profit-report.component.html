@@ -1,0 +1,218 @@
+﻿<div class="report-container">
+  <app-page-header
+    title="Cost & Profit Report"
+    subtitle="Monthly production cost analysis and profit margin breakdown by product"
+    icon="chart-bar">
+  </app-page-header>
+
+  <!-- ── Filter Card ─────────────────────────────────────────── -->
+  <div class="filter-card">
+    <div class="filter-grid">
+      <div class="filter-item filter-item-wide">
+        <label class="filter-label">Date Range</label>
+        <p-calendar [(ngModel)]="dateRange" selectionMode="range"
+          [readonlyInput]="true" placeholder="Select date range"
+          dateFormat="dd/mm/yy" [showIcon]="true" styleClass="w-full rpt-calendar">
+        </p-calendar>
+      </div>
+      <div class="filter-item">
+        <label class="filter-label">Product</label>
+        <p-dropdown [(ngModel)]="selectedProductId" [options]="productOptions"
+          optionLabel="label" optionValue="value" placeholder="All Products"
+          [filter]="true" filterBy="label" styleClass="rpt-dropdown">
+        </p-dropdown>
+      </div>
+      <div class="filter-actions">
+        <button class="btn-primary" (click)="onApplyFilters()">
+          <i class="pi pi-search"></i> Apply
+        </button>
+        <button class="btn-ghost" (click)="onClearFilters()">
+          <i class="pi pi-times"></i> Clear
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Tab Bar ──────────────────────────────────────────────── -->
+  <div class="tab-bar">
+    <button class="tab-btn" [class.tab-active]="activeTab === 'cost'" (click)="setTab('cost')">
+      <i class="pi pi-money-bill"></i>
+      Cost &amp; Profit
+      <span class="tab-count" *ngIf="costData">{{ costData.records.length }}</span>
+    </button>
+    <button class="tab-btn" [class.tab-active]="activeTab === 'sales'" (click)="setTab('sales')">
+      <i class="pi pi-chart-line"></i>
+      Sales Profit
+      <span class="tab-count" *ngIf="salesData">{{ salesData.records.length }}</span>
+    </button>
+  </div>
+
+  <!-- ── KPI Summary Cards ────────────────────────────────────── -->
+  <div class="kpi-row" *ngIf="!loading && currentSummary">
+    <div class="kpi-card kpi-cyan kpi-highlight">
+      <div class="kpi-icon"><i class="pi pi-chart-line"></i></div>
+      <div class="kpi-body">
+        <div class="kpi-label">Total Revenue</div>
+        <div class="kpi-value">₹{{ formatCurrency(currentSummary.totalRevenue) }}</div>
+      </div>
+    </div>
+    <div class="kpi-card kpi-red">
+      <div class="kpi-icon"><i class="pi pi-money-bill"></i></div>
+      <div class="kpi-body">
+        <div class="kpi-label">Total Cost</div>
+        <div class="kpi-value">₹{{ formatCurrency(currentSummary.totalCost) }}</div>
+      </div>
+    </div>
+    <div class="kpi-card kpi-green">
+      <div class="kpi-icon"><i class="pi pi-arrow-up"></i></div>
+      <div class="kpi-body">
+        <div class="kpi-label">Total Profit</div>
+        <div class="kpi-value">₹{{ formatCurrency(currentSummary.totalProfit) }}</div>
+      </div>
+    </div>
+    <div class="kpi-card kpi-violet">
+      <div class="kpi-icon"><i class="pi pi-percentage"></i></div>
+      <div class="kpi-body">
+        <div class="kpi-label">Overall Margin</div>
+        <div class="kpi-value">{{ formatPercent(currentSummary.overallMarginPercent) }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Skeleton KPIs -->
+  <div class="kpi-row" *ngIf="loading">
+    <div class="kpi-card" *ngFor="let i of [1,2,3,4]">
+      <p-skeleton width="100%" height="64px" borderRadius="10px"></p-skeleton>
+    </div>
+  </div>
+
+  <!-- ── Cost & Profit Table ──────────────────────────────────── -->
+  <div class="table-card" *ngIf="activeTab === 'cost'">
+    <div class="table-info-bar">
+      <span class="record-count" *ngIf="costData && !loading">
+        {{ costData.records.length }} records
+      </span>
+      <span class="section-title"><i class="pi pi-money-bill"></i> Production Cost vs Revenue</span>
+    </div>
+    <div class="table-scroll-wrapper">
+      <table class="rpt-table">
+        <thead>
+          <tr>
+            <th class="th-sno">S.NO</th>
+            <th>PRODUCT</th>
+            <th class="th-center">MONTH</th>
+            <th class="th-center">PRODUCED QTY</th>
+            <th class="th-center">SOLD QTY</th>
+            <th class="th-right">REVENUE</th>
+            <th class="th-right">COST/BOX</th>
+            <th class="th-right">TOTAL COST</th>
+            <th class="th-right">PROFIT</th>
+            <th class="th-center">MARGIN</th>
+          </tr>
+        </thead>
+        <tbody>
+          <ng-container *ngIf="loading">
+            <tr class="skeleton-row" *ngFor="let i of [1,2,3,4,5,6]">
+              <td *ngFor="let j of [1,2,3,4,5,6,7,8,9,10]">
+                <p-skeleton height="14px" borderRadius="4px"></p-skeleton>
+              </td>
+            </tr>
+          </ng-container>
+          <tr *ngFor="let row of costRecords; let i = index" class="data-row">
+            <td class="td-sno">{{ i + 1 }}</td>
+            <td><span class="td-primary-text">{{ row.productName }}</span></td>
+            <td class="td-center">
+              <span class="month-badge">{{ row.yearMonth }}</span>
+            </td>
+            <td class="td-center td-bold td-blue">{{ row.producedQty | number }}</td>
+            <td class="td-center td-num">{{ row.soldQty | number }}</td>
+            <td class="td-right td-mono">₹{{ formatCurrency(row.revenue) }}</td>
+            <td class="td-right td-mono">₹{{ formatCurrency(row.costPerBox) }}</td>
+            <td class="td-right td-mono td-red">₹{{ formatCurrency(row.totalCost) }}</td>
+            <td class="td-right td-mono" [ngClass]="row.profit >= 0 ? 'td-green td-bold' : 'td-red td-bold'">
+              ₹{{ formatCurrency(row.profit) }}
+            </td>
+            <td class="td-center">
+              <span class="margin-chip" [ngClass]="marginClass(row.marginPercent)">
+                {{ formatPercent(row.marginPercent) }}
+              </span>
+            </td>
+          </tr>
+          <tr *ngIf="!loading && costRecords.length === 0">
+            <td colspan="10">
+              <div class="empty-state">
+                <div class="empty-icon"><i class="pi pi-chart-bar"></i></div>
+                <div class="empty-title">No cost data found</div>
+                <div class="empty-sub">Select a date range and click Apply to load data.</div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── Sales Profit Table ───────────────────────────────────── -->
+  <div class="table-card" *ngIf="activeTab === 'sales'">
+    <div class="table-info-bar">
+      <span class="record-count" *ngIf="salesData && !loading">
+        {{ salesData.records.length }} records
+      </span>
+      <span class="section-title"><i class="pi pi-chart-line"></i> Sales Revenue vs Cost of Goods</span>
+    </div>
+    <div class="table-scroll-wrapper">
+      <table class="rpt-table">
+        <thead>
+          <tr>
+            <th class="th-sno">S.NO</th>
+            <th>PRODUCT</th>
+            <th class="th-center">MONTH</th>
+            <th class="th-center">SOLD QTY</th>
+            <th class="th-right">REVENUE</th>
+            <th class="th-right">COST/BOX</th>
+            <th class="th-right">TOTAL COST</th>
+            <th class="th-right">PROFIT</th>
+            <th class="th-center">MARGIN</th>
+          </tr>
+        </thead>
+        <tbody>
+          <ng-container *ngIf="loading">
+            <tr class="skeleton-row" *ngFor="let i of [1,2,3,4,5,6]">
+              <td *ngFor="let j of [1,2,3,4,5,6,7,8,9]">
+                <p-skeleton height="14px" borderRadius="4px"></p-skeleton>
+              </td>
+            </tr>
+          </ng-container>
+          <tr *ngFor="let row of salesRecords; let i = index" class="data-row">
+            <td class="td-sno">{{ i + 1 }}</td>
+            <td><span class="td-primary-text">{{ row.productName }}</span></td>
+            <td class="td-center">
+              <span class="month-badge">{{ row.yearMonth }}</span>
+            </td>
+            <td class="td-center td-bold td-blue">{{ row.soldQty | number }}</td>
+            <td class="td-right td-mono">₹{{ formatCurrency(row.revenue) }}</td>
+            <td class="td-right td-mono">₹{{ formatCurrency(row.costPerBox) }}</td>
+            <td class="td-right td-mono td-red">₹{{ formatCurrency(row.totalCost) }}</td>
+            <td class="td-right td-mono" [ngClass]="row.profit >= 0 ? 'td-green td-bold' : 'td-red td-bold'">
+              ₹{{ formatCurrency(row.profit) }}
+            </td>
+            <td class="td-center">
+              <span class="margin-chip" [ngClass]="marginClass(row.marginPercent)">
+                {{ formatPercent(row.marginPercent) }}
+              </span>
+            </td>
+          </tr>
+          <tr *ngIf="!loading && salesRecords.length === 0">
+            <td colspan="9">
+              <div class="empty-state">
+                <div class="empty-icon"><i class="pi pi-chart-line"></i></div>
+                <div class="empty-title">No sales profit data found</div>
+                <div class="empty-sub">Select a date range and click Apply to load data.</div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

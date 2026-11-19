@@ -1,0 +1,62 @@
+<div class="box-stock-list-container">
+  <app-page-header title="Box Stock" 
+    subtitle="Monitor and manage box inventory levels" 
+    icon="warehouse" [showAddButton]="true" 
+    addButtonLabel="Add Stock" (onAdd)="onAdd()">
+    <div actions class="search-wrapper">
+      <i class="pi pi-search search-icon"></i>
+      <input type="text" [formControl]="searchControl" placeholder="Search by product..." class="modern-search" />
+    </div>
+  </app-page-header>
+
+  <div class="table-wrapper">
+    <div class="modern-table-container">
+      <table class="modern-table">
+        <thead>
+          <tr>
+            <th class="col-sno">S.NO</th>
+            <th class="col-product">PRODUCT NAME</th>
+            <th class="col-quantity">QUANTITY</th>
+            <th class="col-min-level">MIN STOCK LEVEL</th>
+            <th class="col-status">STATUS</th>
+            <th class="col-updated">LAST UPDATED</th>
+            <th class="col-actions">ACTIONS</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let stock of (filteredBoxStocks$ | async); let i = index" class="table-row">
+            <td class="cell-sno"><span class="sno-text">{{ i + 1 }}</span></td>
+            <td class="cell-product"><div class="product-text">{{ stock.productName }}</div></td>
+            <td class="cell-quantity"><span class="quantity-value">{{ stock.quantity | number:'1.0-0' }}</span></td>
+            <td class="cell-min-level"><span class="min-level-value">{{ stock.minStockLevel | number:'1.0-0' }}</span></td>
+            <td class="cell-status">
+              <span class="status-badge" [ngClass]="getStockStatusClass(stock.quantity, stock.minStockLevel)">
+                <i class="pi" [ngClass]="getStockStatusIcon(stock.quantity, stock.minStockLevel)"></i>
+                {{ getStockStatusLabel(stock.quantity, stock.minStockLevel) }}
+              </span>
+            </td>
+            <td class="cell-updated"><span class="updated-text">{{ stock.lastUpdated ? (stock.lastUpdated | date:'MMM dd, yyyy') : 'N/A' }}</span></td>
+            <td class="cell-actions">
+              <div class="action-group">
+                <button class="btn-action btn-edit" (click)="onEdit(stock.id)" pTooltip="Edit" tooltipPosition="top"><i class="pi pi-pencil"></i></button>
+                <button class="btn-action btn-delete" (click)="onDelete(stock)" pTooltip="Delete" tooltipPosition="top"><i class="pi pi-trash"></i></button>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="(filteredBoxStocks$ | async)?.length === 0 && !(loading$ | async)" class="empty-row">
+            <td colspan="7">
+              <div class="empty-state">
+                <div class="empty-icon"><i class="pi pi-warehouse"></i></div>
+                <h3 class="empty-title">No Box Stock Found</h3>
+                <p class="empty-text">Start tracking box inventory by adding stock</p>
+                <button class="btn-primary-empty" (click)="onAdd()"><i class="pi pi-plus"></i>Add Stock</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div *ngIf="(loading$ | async)" class="loading-overlay"><div class="loading-spinner"><i class="pi pi-spin pi-spinner"></i><span>Loading box stocks...</span></div></div>
+    </div>
+  </div>
+  <app-confirm-dialog></app-confirm-dialog>
+</div>

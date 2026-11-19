@@ -1,0 +1,95 @@
+<div class="production-order-form-container">
+  <app-page-header
+    [title]="isEditMode ? 'Edit Production Order' : 'New Production Order'"
+    [subtitle]="isEditMode ? 'Update production order details' : 'Create a new production order'"
+    icon="cog">
+  </app-page-header>
+
+  <div class="form-card">
+    <p-card>
+      <form [formGroup]="orderForm" (ngSubmit)="onSubmit()">
+        <div class="form-grid">
+          <!-- Product Selection -->
+          <div class="form-field full-width">
+            <label for="product" class="field-label">
+              Product <span class="required">*</span>
+            </label>
+            <p-dropdown
+              id="product"
+              formControlName="productId"
+              [options]="products"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="Select a product"
+              [filter]="true"
+              filterBy="label"
+              [showClear]="true"
+              [class.invalid]="f['productId'].invalid && f['productId'].touched">
+            </p-dropdown>
+            <small class="error-message" *ngIf="f['productId'].invalid && f['productId'].touched">
+              Product is required
+            </small>
+          </div>
+
+          <!-- Quantity -->
+          <div class="form-field">
+            <label for="quantity" class="field-label">
+              Quantity (pads) <span class="required">*</span>
+            </label>
+            <p-inputNumber
+              id="quantity"
+              formControlName="quantity"
+              [min]="1"
+              [showButtons]="true"
+              buttonLayout="horizontal"
+              incrementButtonIcon="pi pi-plus"
+              decrementButtonIcon="pi pi-minus"
+              placeholder="Enter quantity"
+              [class.invalid]="f['quantity'].invalid && f['quantity'].touched">
+            </p-inputNumber>
+            <small class="error-message" *ngIf="f['quantity'].invalid && f['quantity'].touched">
+              <span *ngIf="f['quantity'].errors?.['required']">Quantity is required</span>
+              <span *ngIf="f['quantity'].errors?.['min']">Quantity must be at least 1</span>
+            </small>
+          </div>
+        </div>
+
+        <!-- Info Box -->
+        <div class="info-box">
+          <i class="pi pi-info-circle"></i>
+          <div class="info-content">
+            <strong class="info-title">Production Workflow</strong>
+            <p class="info-text">
+              Once created, the production order will have status "CREATED". You can then start the production 
+              process by executing stages sequentially: <strong>SEALING → FINAL CUTTING → FOLDING → PACKING</strong>
+            </p>
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <button 
+            pButton 
+            type="button"
+            label="Cancel" 
+            icon="pi pi-times" 
+            class="p-button-secondary"
+            (click)="goBack()"
+            [disabled]="submitting">
+          </button>
+          <button 
+            pButton 
+            type="submit"
+            [label]="isEditMode ? 'Update Order' : 'Create Order'" 
+            icon="pi pi-check"
+            class="p-button-primary"
+            [loading]="submitting"
+            [disabled]="orderForm.invalid || submitting">
+          </button>
+        </div>
+      </form>
+    </p-card>
+  </div>
+</div>
+
+<p-toast position="top-right"></p-toast>

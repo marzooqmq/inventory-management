@@ -1,0 +1,50 @@
+<div class="product-conversion-list-container">
+  <app-page-header title="Product Conversions" subtitle="Manage unit packaging and conversions" icon="sort-alt" [showAddButton]="true" addButtonLabel="Add Conversion" (onAdd)="onAdd()">
+    <div actions class="search-wrapper">
+      <i class="pi pi-search search-icon"></i>
+      <input type="text" [formControl]="searchControl" placeholder="Search by product..." class="modern-search" />
+    </div>
+  </app-page-header>
+
+  <div class="table-wrapper">
+    <div class="modern-table-container">
+      <table class="modern-table">
+        <thead>
+          <tr>
+            <th class="col-sno">S.NO</th>
+            <th class="col-product">PRODUCT</th>
+            <th class="col-unit">UNIT NAME</th>
+            <th class="col-boxes">BOXES PER UNIT</th>
+            <th class="col-actions">ACTIONS</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let conversion of (filteredProductConversions$ | async); let i = index" class="table-row">
+            <td class="cell-sno"><span class="sno-text">{{ i + 1 }}</span></td>
+            <td class="cell-product"><div class="product-text">{{ conversion.productName }}</div></td>
+            <td class="cell-unit"><span class="unit-badge">{{ conversion.unitName }}</span></td>
+            <td class="cell-boxes"><span class="boxes-value">{{ conversion.boxesPerUnit }}</span></td>
+            <td class="cell-actions">
+              <div class="action-group">
+                <button class="btn-action btn-edit" (click)="onEdit(conversion.id)" pTooltip="Edit" tooltipPosition="top"><i class="pi pi-pencil"></i></button>
+                <button class="btn-action btn-delete" (click)="onDelete(conversion)" pTooltip="Delete" tooltipPosition="top"><i class="pi pi-trash"></i></button>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="(filteredProductConversions$ | async)?.length === 0 && !(loading$ | async)" class="empty-row">
+            <td colspan="5">
+              <div class="empty-state">
+                <div class="empty-icon"><i class="pi pi-sort-alt"></i></div>
+                <h3 class="empty-title">No Product Conversions Found</h3>
+                <p class="empty-text">Get started by adding unit packaging conversions</p>
+                <button class="btn-primary-empty" (click)="onAdd()"><i class="pi pi-plus"></i>Add Conversion</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div *ngIf="(loading$ | async)" class="loading-overlay"><div class="loading-spinner"><i class="pi pi-spin pi-spinner"></i><span>Loading conversions...</span></div></div>
+    </div>
+  </div>
+  <app-confirm-dialog></app-confirm-dialog>
+</div>

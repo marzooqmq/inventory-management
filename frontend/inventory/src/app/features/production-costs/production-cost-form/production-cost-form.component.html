@@ -1,0 +1,184 @@
+<div class="production-cost-form-container">
+  <app-page-header
+    [title]="isEditMode ? 'Edit Production Cost' : 'Add Production Cost'"
+    [subtitle]="isEditMode ? 'Update manufacturing overhead and production expenses' : 'Create new production cost entry'"
+    icon="cog">
+  </app-page-header>
+
+  <div class="form-card">
+    <p-card>
+      <form [formGroup]="productionCostForm" (ngSubmit)="onSubmit()">
+        <div class="form-grid">
+          <!-- Product -->
+          <div class="form-field full-width">
+            <label for="productId" class="field-label">
+              Product <span class="required">*</span>
+            </label>
+            <p-dropdown
+              id="productId"
+              formControlName="productId"
+              [options]="(products$ | async) || []"
+              optionLabel="name"
+              optionValue="id"
+              placeholder="Select product"
+              [showClear]="true"
+              [filter]="true"
+              filterBy="name"
+              [class.invalid]="isFieldInvalid('productId')">
+            </p-dropdown>
+            <small class="error-message" *ngIf="isFieldInvalid('productId')">
+              {{ getErrorMessage('productId') }}
+            </small>
+          </div>
+
+          <!-- Labour Cost -->
+          <div class="form-field">
+            <label for="labourCost" class="field-label">
+              Labour Cost <span class="required">*</span>
+            </label>
+            <p-inputNumber
+              id="labourCost"
+              formControlName="labourCost"
+              mode="currency"
+              currency="INR"
+              locale="en-IN"
+              [min]="0"
+              [minFractionDigits]="2"
+              [maxFractionDigits]="2"
+              placeholder="Enter labour cost"
+              [class.invalid]="isFieldInvalid('labourCost')">
+            </p-inputNumber>
+            <small class="field-help">Cost of labour per unit</small>
+            <small class="error-message" *ngIf="isFieldInvalid('labourCost')">
+              {{ getErrorMessage('labourCost') }}
+            </small>
+          </div>
+
+          <!-- Transport Cost -->
+          <div class="form-field">
+            <label for="transportCost" class="field-label">
+              Transport Cost <span class="required">*</span>
+            </label>
+            <p-inputNumber
+              id="transportCost"
+              formControlName="transportCost"
+              mode="currency"
+              currency="INR"
+              locale="en-IN"
+              [min]="0"
+              [minFractionDigits]="2"
+              [maxFractionDigits]="2"
+              placeholder="Enter transport cost"
+              [class.invalid]="isFieldInvalid('transportCost')">
+            </p-inputNumber>
+            <small class="field-help">Transportation and logistics cost per unit</small>
+            <small class="error-message" *ngIf="isFieldInvalid('transportCost')">
+              {{ getErrorMessage('transportCost') }}
+            </small>
+          </div>
+
+          <!-- Herbal Cost -->
+          <div class="form-field">
+            <label for="herbalCost" class="field-label">
+              Herbal Cost <span class="required">*</span>
+            </label>
+            <p-inputNumber
+              id="herbalCost"
+              formControlName="herbalCost"
+              mode="currency"
+              currency="INR"
+              locale="en-IN"
+              [min]="0"
+              [minFractionDigits]="2"
+              [maxFractionDigits]="2"
+              placeholder="Enter herbal cost"
+              [class.invalid]="isFieldInvalid('herbalCost')">
+            </p-inputNumber>
+            <small class="field-help">Herbal ingredients and additives cost per unit</small>
+            <small class="error-message" *ngIf="isFieldInvalid('herbalCost')">
+              {{ getErrorMessage('herbalCost') }}
+            </small>
+          </div>
+
+          <!-- Machine Cost -->
+          <div class="form-field">
+            <label for="machineCost" class="field-label">
+              Machine Cost <span class="required">*</span>
+            </label>
+            <p-inputNumber
+              id="machineCost"
+              formControlName="machineCost"
+              mode="currency"
+              currency="INR"
+              locale="en-IN"
+              [min]="0"
+              [minFractionDigits]="2"
+              [maxFractionDigits]="2"
+              placeholder="Enter machine cost"
+              [class.invalid]="isFieldInvalid('machineCost')">
+            </p-inputNumber>
+            <small class="field-help">Machine depreciation and maintenance cost per unit</small>
+            <small class="error-message" *ngIf="isFieldInvalid('machineCost')">
+              {{ getErrorMessage('machineCost') }}
+            </small>
+          </div>
+
+          <!-- Overhead Cost -->
+          <div class="form-field">
+            <label for="overheadCost" class="field-label">
+              Overhead Cost <span class="required">*</span>
+            </label>
+            <p-inputNumber
+              id="overheadCost"
+              formControlName="overheadCost"
+              mode="currency"
+              currency="INR"
+              locale="en-IN"
+              [min]="0"
+              [minFractionDigits]="2"
+              [maxFractionDigits]="2"
+              placeholder="Enter overhead cost"
+              [class.invalid]="isFieldInvalid('overheadCost')">
+            </p-inputNumber>
+            <small class="field-help">Other overhead expenses per unit</small>
+            <small class="error-message" *ngIf="isFieldInvalid('overheadCost')">
+              {{ getErrorMessage('overheadCost') }}
+            </small>
+          </div>
+
+          <!-- Total Cost Display -->
+          <div class="form-field total-cost-field full-width">
+            <label class="field-label">Total Production Cost</label>
+            <div class="total-cost-display">
+              {{ formatCurrency(totalCost) }}
+            </div>
+            <small class="field-help">Sum of all production costs</small>
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <button
+            pButton
+            pRipple
+            type="button"
+            label="Cancel"
+            icon="pi pi-times"
+            class="p-button-text p-button-secondary"
+            (click)="onCancel()">
+          </button>
+          <button
+            pButton
+            pRipple
+            type="submit"
+            [label]="isEditMode ? 'Update' : 'Create'"
+            icon="pi pi-check"
+            class="p-button-primary"
+            [loading]="(loading$ | async) ?? false"
+            [disabled]="productionCostForm.invalid">
+          </button>
+        </div>
+      </form>
+    </p-card>
+  </div>
+</div>

@@ -1,0 +1,123 @@
+<div class="product-price-list-container">
+  <app-page-header
+    title="Product Prices"
+    subtitle="Manage customer-specific pricing across different segments"
+    icon="tag"
+    [showAddButton]="true"
+    addButtonLabel="Add Price"
+    (onAdd)="onAdd()">
+    <div actions class="search-wrapper">
+      <i class="pi pi-search search-icon"></i>
+      <input 
+        type="text" 
+        [formControl]="searchControl"
+        placeholder="Search by product or customer type..." 
+        class="modern-search" />
+    </div>
+  </app-page-header>
+
+  <div class="pricing-segments">
+    <div class="segment-card" 
+         *ngFor="let group of groupedProductPrices$ | async"
+         [attr.data-segment]="group.customerType">
+      
+      <!-- Segment Header -->
+      <div class="segment-header" 
+           [ngClass]="'segment-' + group.customerType.toLowerCase()"
+           (click)="toggleGroup(group)">
+        <div class="header-main">
+          <div class="segment-icon-wrapper">
+            <div class="segment-icon" [ngClass]="'icon-' + group.customerType.toLowerCase()">
+              <i [class]="getCustomerTypeIcon(group.customerType)"></i>
+            </div>
+          </div>
+          <div class="segment-info">
+            <h2 class="segment-title">{{ group.label }}</h2>
+            <p class="segment-subtitle">{{ getCustomerTypeDescription(group.customerType) }}</p>
+          </div>
+        </div>
+        <div class="header-actions">
+          <div class="product-count">
+            <span class="count-value">{{ group.prices.length }}</span>
+            <span class="count-label">Products</span>
+          </div>
+          <button class="toggle-btn" [class.active]="group.expanded">
+            <i class="pi" [ngClass]="group.expanded ? 'pi-chevron-up' : 'pi-chevron-down'"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Segment Content -->
+      <div class="segment-content" [@slideDown]="group.expanded ? 'expanded' : 'collapsed'">
+        <div class="content-wrapper">
+          <div class="price-list">
+            <!-- Table Header -->
+            <div class="list-header">
+              <div class="header-col col-index">#</div>
+              <div class="header-col col-product">Product</div>
+              <div class="header-col col-price">Price per Box</div>
+              <div class="header-col col-actions">Actions</div>
+            </div>
+            
+            <!-- Price Items -->
+            <div class="price-item" *ngFor="let productPrice of group.prices; let i = index">
+              <div class="item-col col-index">
+                <div class="index-badge">{{ i + 1 }}</div>
+              </div>
+              <div class="item-col col-product">
+                <div class="product-details">
+                  <i class="pi pi-box product-icon"></i>
+                  <span class="product-name">{{ productPrice.productName }}</span>
+                </div>
+              </div>
+              <div class="item-col col-price">
+                <div class="price-value">
+                  <span class="currency-symbol">₹</span>
+                  <span class="price-amount">{{ productPrice.pricePerBox | number:'1.2-2' }}</span>
+                </div>
+              </div>
+              <div class="item-col col-actions">
+                <div class="action-group">
+                  <button class="btn-action btn-edit" 
+                          (click)="onEdit(productPrice.id); $event.stopPropagation()" 
+                          pTooltip="Edit Price" 
+                          tooltipPosition="top">
+                    <i class="pi pi-pencil"></i>
+                  </button>
+                  <button class="btn-action btn-delete" 
+                          (click)="onDelete(productPrice); $event.stopPropagation()" 
+                          pTooltip="Delete Price" 
+                          tooltipPosition="top">
+                    <i class="pi pi-trash"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="(groupedProductPrices$ | async)?.length === 0">
+      <div class="empty-icon">
+        <i class="pi pi-tag"></i>
+      </div>
+      <h3 class="empty-title">No Product Prices Found</h3>
+      <p class="empty-message">Start by adding your first product price for different customer segments</p>
+      <p-button label="Add First Price" icon="pi pi-plus" (onClick)="onAdd()"></p-button>
+    </div>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" *ngIf="loading$ | async">
+    <div class="loader-content">
+      <i class="pi pi-spin pi-spinner"></i>
+      <span>Loading prices...</span>
+    </div>
+  </div>
+</div>
+
+<app-confirm-dialog></app-confirm-dialog>
+
+<app-confirm-dialog></app-confirm-dialog>

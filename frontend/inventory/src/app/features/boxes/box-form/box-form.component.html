@@ -1,0 +1,97 @@
+<div class="box-form-container">
+  <app-page-header
+    [title]="isEditMode ? 'Edit Box' : 'Add New Box'"
+    [subtitle]="isEditMode ? 'Update box packaging cost details' : 'Create a new box packaging cost'"
+    icon="box">
+  </app-page-header>
+
+  <div class="form-card">
+    <p-card>
+      <form [formGroup]="boxForm" (ngSubmit)="onSubmit()">
+        <div class="form-grid">
+          <!-- Product -->
+          <div class="form-field full-width">
+            <label for="productId" class="field-label">
+              Product <span class="required">*</span>
+            </label>
+            <p-dropdown
+              id="productId"
+              formControlName="productId"
+              [options]="(products$ | async) || []"
+              optionLabel="name"
+              optionValue="id"
+              placeholder="Select product"
+              [showClear]="true"
+              [filter]="true"
+              filterBy="name"
+              [class.invalid]="isFieldInvalid('productId')">
+            </p-dropdown>
+            <small class="error-message" *ngIf="isFieldInvalid('productId')">
+              {{ getErrorMessage('productId') }}
+            </small>
+          </div>
+
+          <!-- Box Cost Per Pad -->
+          <div class="form-field">
+            <label for="boxCostPerPad" class="field-label">
+              Box Cost Per Pad <span class="required">*</span>
+            </label>
+            <p-inputNumber
+              id="boxCostPerPad"
+              formControlName="boxCostPerPad"
+              mode="currency"
+              currency="INR"
+              locale="en-IN"
+              [min]="0"
+              [minFractionDigits]="2"
+              [maxFractionDigits]="2"
+              placeholder="Enter box cost per pad"
+              [class.invalid]="isFieldInvalid('boxCostPerPad')">
+            </p-inputNumber>
+            <small class="field-help">Cost of packaging per individual pad</small>
+            <small class="error-message" *ngIf="isFieldInvalid('boxCostPerPad')">
+              {{ getErrorMessage('boxCostPerPad') }}
+            </small>
+          </div>
+
+          <!-- Active Status -->
+          <div class="form-field">
+            <label class="field-label">Status</label>
+            <div class="checkbox-wrapper">
+              <p-checkbox
+                formControlName="active"
+                [binary]="true"
+                inputId="active">
+              </p-checkbox>
+              <label for="active" class="checkbox-label">Active</label>
+            </div>
+            <small class="field-help">Inactive boxes won't be used in cost calculations</small>
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <button
+            pButton
+            pRipple
+            type="button"
+            label="Cancel"
+            icon="pi pi-times"
+            class="p-button-text p-button-secondary"
+            (click)="onCancel()">
+          </button>
+          <button
+            pButton
+            pRipple
+            type="submit"
+            [label]="isEditMode ? 'Update Box' : 'Create Box'"
+            icon="pi pi-check"
+            class="p-button-primary"
+            [loading]="(loading$ | async) ?? false"
+            [disabled]="boxForm.invalid">
+          </button>
+        </div>
+      </form>
+    </p-card>
+  </div>
+</div>

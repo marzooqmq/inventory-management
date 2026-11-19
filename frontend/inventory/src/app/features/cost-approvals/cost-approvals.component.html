@@ -1,0 +1,101 @@
+<div class="cost-approval-container">
+  <app-page-header 
+    title="Cost Price Approvals" 
+    subtitle="Review and approve calculated cost price changes" 
+    icon="check-circle">
+    <div actions>
+      <button pButton pRipple type="button" label="Back to Products" icon="pi pi-arrow-left" class="back-btn" (click)="navigateToProducts()"></button>
+    </div>
+  </app-page-header>
+
+  <div class="table-wrapper">
+    <div class="modern-table-container">
+      <table class="modern-table">
+        <thead>
+          <tr>
+            <th class="col-sno">S.NO</th>
+            <th class="col-product">PRODUCT NAME</th>
+            <th class="col-category">CATEGORY</th>
+            <th class="col-current">CURRENT COST</th>
+            <th class="col-new">NEW COST</th>
+            <th class="col-calculated">CALCULATED ON</th>
+            <th class="col-change">CHANGE</th>
+            <th class="col-actions">ACTIONS</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let product of (pendingApprovals$ | async); let i = index" class="table-row">
+            <td class="cell-sno"><span class="sno-text">{{ i + 1 }}</span></td>
+            <td class="cell-product">
+              <div class="product-text">{{ product.name }}</div>
+              <div class="product-size">{{ product.size }}</div>
+            </td>
+            <td class="cell-category">
+              <p-tag [value]="getCategoryLabel(product.category)" [severity]="getCategorySeverity(product.category)"></p-tag>
+            </td>
+            <td class="cell-current"><span class="cost-value">{{ formatCurrency(product.costPrice) }}</span></td>
+            <td class="cell-new"><span class="cost-value new-cost">{{ formatCurrency(product.calculatedCostPrice) }}</span></td>
+            <td class="cell-calculated"><span class="date-text">{{ formatDate(product.costCalculatedAt) }}</span></td>
+            <td class="cell-change">
+              <span class="change-badge" [ngClass]="(product.calculatedCostPrice || 0) > (product.costPrice || 0) ? 'change-increase' : 'change-decrease'">
+                {{ ((product.calculatedCostPrice || 0) > (product.costPrice || 0) ? '+' : '') + formatCurrency((product.calculatedCostPrice || 0) - (product.costPrice || 0)) }}
+              </span>
+            </td>
+            <td class="cell-actions">
+              <button pButton pRipple type="button" label="Approve" icon="pi pi-check" class="p-button-sm btn-approve-action" (click)="openApprovalDialog(product)"></button>
+            </td>
+          </tr>
+          <tr *ngIf="(pendingApprovals$ | async)?.length === 0 && !(loading$ | async)" class="empty-row">
+            <td colspan="8">
+              <div class="empty-state">
+                <div class="empty-icon"><i class="pi pi-check-circle"></i></div>
+                <h3 class="empty-title">No Pending Approvals</h3>
+                <p class="empty-text">All cost prices are up to date!</p>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div *ngIf="(loading$ | async)" class="loading-overlay"><div class="loading-spinner"><i class="pi pi-spin pi-spinner"></i><span>Loading approvals...</span></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Approval Dialog -->
+<p-dialog [(visible)]="showApprovalDialog" header="Approve Cost Price Change" [modal]="true" [style]="{width: '520px'}" [draggable]="false" [resizable]="false" styleClass="approval-dialog">
+  <div class="dialog-content" *ngIf="selectedProduct">
+    <div class="product-section">
+      <label class="section-label">Product</label>
+      <div class="product-info">
+        <div class="product-name">{{ selectedProduct.name }}</div>
+        <div class="product-details">{{ selectedProduct.category }} · {{ selectedProduct.size }}</div>
+      </div>
+    </div>
+    
+    <div class="cost-section">
+      <label class="section-label">Cost Price Change</label>
+      <div class="cost-comparison">
+        <div class="cost-box">
+          <span class="cost-label">Current</span>
+          <span class="cost-value current">{{ formatCurrency(selectedProduct.costPrice) }}</span>
+        </div>
+        <i class="pi pi-arrow-right cost-arrow"></i>
+        <div class="cost-box">
+          <span class="cost-label">New</span>
+          <span class="cost-value new">{{ formatCurrency(selectedProduct.calculatedCostPrice) }}</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="date-section">
+      <label class="section-label">Effective Date <span class="required">*</span></label>
+      <p-calendar [(ngModel)]="effectiveDate" [showIcon]="true" dateFormat="yy-mm-dd" [minDate]="today" placeholder="Select effective date" [style]="{'width': '100%'}"></p-calendar>
+      <small class="help-text">When should this new cost price take effect?</small>
+    </div>
+  </div>
+  
+  <ng-template pTemplate="footer">
+    <button pButton pRipple type="button" label="Cancel" class="p-button-text" (click)="closeApprovalDialog()"></button>
+    <button pButton pRipple type="button" label="Approve" icon="pi pi-check" class="p-button-success" (click)="approveCostChange()"></button>
+  </ng-template>
+</p-dialog>

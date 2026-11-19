@@ -1,0 +1,39 @@
+<div class="hub-container">
+  <div class="hub-header">
+    <div class="hub-header-icon">
+      <i class="pi pi-file-export"></i>
+    </div>
+    <div>
+      <h1 class="hub-title">Reports Center</h1>
+      <p class="hub-subtitle">Select a report to view insights, export data, or drill down into details.</p>
+    </div>
+  </div>
+
+  <div class="report-grid">
+    <div
+      class="report-card"
+      *ngFor="let report of visibleReports"
+      [class]="'report-card report-card--' + report.color"
+      (click)="navigate(report.route)"
+      role="button"
+      tabindex="0"
+      (keyup.enter)="navigate(report.route)">
+
+      <div class="rc-top">
+        <div class="rc-icon-wrap" [class]="'rc-icon-wrap--' + report.color">
+          <i [class]="report.icon"></i>
+        </div>
+        <span class="rc-badge" *ngIf="report.badge">{{ report.badge }}</span>
+      </div>
+
+      <div class="rc-body">
+        <h3 class="rc-title">{{ report.title }}</h3>
+        <p class="rc-desc">{{ report.description }}</p>
+      </div>
+
+      <div class="rc-footer">
+        <span class="rc-link">View Report <i class="pi pi-arrow-right"></i></span>
+      </div>
+    </div>
+  </div>
+</div>

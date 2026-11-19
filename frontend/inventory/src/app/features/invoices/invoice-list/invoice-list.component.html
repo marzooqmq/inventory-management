@@ -1,0 +1,249 @@
+<div class="invoice-list-container">
+  <app-page-header
+    title="Invoices"
+    subtitle="Manage sales invoices and billing"
+    icon="file-invoice"
+    [showAddButton]="true"
+    addButtonLabel="Create Invoice"
+    (onAdd)="onCreateInvoice()">
+    <div actions class="filter-group">
+      <div class="search-wrapper">
+        <i class="pi pi-search search-icon"></i>
+        <input 
+          type="text" 
+          [formControl]="searchControl"
+          placeholder="Search by invoice#, customer, phone..." 
+          class="modern-search" />
+      </div>
+      <p-dropdown
+        [formControl]="statusFilter"
+        [options]="statusOptions"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="All Status"
+        styleClass="filter-dropdown">
+      </p-dropdown>
+      <p-dropdown
+        [formControl]="paymentFilter"
+        [options]="paymentOptions"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="All Payments"
+        styleClass="filter-dropdown">
+      </p-dropdown>
+    </div>
+  </app-page-header>
+
+  <!-- Invoices Table -->
+  <div class="table-wrapper">
+    <div class="modern-table-container">
+      <table class="modern-table">
+        <thead>
+          <tr>
+            <th class="cell-index">S.NO.</th>
+            <th class="cell-invoice">INVOICE</th>
+            <th class="cell-customer">CUSTOMER</th>
+            <th class="cell-date">DATE</th>
+            <th class="cell-amounts">AMOUNTS</th>
+            <th class="cell-status">STATUS</th>
+            <th class="cell-payment">PAYMENT</th>
+            <th class="cell-actions">ACTIONS</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let invoice of (filteredInvoices$ | async); let i = index" class="table-row">
+            <td class="cell-index">
+              <span class="sno-text">{{ i + 1 }}</span>
+            </td>
+            
+            <td class="cell-invoice">
+              <div class="invoice-info">
+                <div class="invoice-number">{{ invoice.invoiceNumber }}</div>
+                <div class="invoice-items">
+                  {{ invoice.items.length || 0 }} items
+                </div>
+              </div>
+            </td>
+            
+            <td class="cell-customer">
+              <div class="customer-info">
+                <div class="customer-name">{{ invoice.customerName }}</div>
+                <div class="customer-phone">
+                  <i class="pi pi-phone"></i>
+                  {{ invoice.phoneNumber }}
+                </div>
+              </div>
+            </td>
+            
+            <td class="cell-date">
+              <div class="date-info">
+                <i class="pi pi-calendar"></i>
+                {{ formatDate(invoice.invoiceDate) }}
+              </div>
+            </td>
+            
+            <td class="cell-amounts">
+              <div class="amount-display">
+                <div class="main-amount">{{ formatCurrency(invoice.netAmount) }}</div>
+                <div class="payment-details" *ngIf="invoice.paymentStatus === 'PAID'">
+                  <span class="paid-badge"><i class="pi pi-check-circle"></i> Paid in Full</span>
+                </div>
+                <div class="payment-details" *ngIf="invoice.paymentStatus === 'PARTIALLY_PAID'">
+                  <span class="partial-text">Paid: {{ formatCurrency(invoice.paidAmount) }}</span>
+                  <span class="due-text">Due: {{ formatCurrency(invoice.netAmount - invoice.paidAmount) }}</span>
+                </div>
+                <div class="payment-details" *ngIf="invoice.paymentStatus === 'UNPAID'">
+                  <span class="unpaid-badge"><i class="pi pi-clock"></i> {{ formatCurrency(invoice.netAmount) }} Due</span>
+                </div>
+              </div>
+            </td>
+            
+            <td class="cell-status">
+              <p-tag 
+                [value]="invoice.status" 
+                [severity]="getStatusSeverity(invoice.status)">
+              </p-tag>
+            </td>
+            
+            <td class="cell-payment">
+              <p-tag 
+                [value]="getPaymentStatusLabel(invoice.paymentStatus)" 
+                [severity]="getPaymentSeverity(invoice.paymentStatus)">
+              </p-tag>
+            </td>
+            
+            <td class="cell-actions">
+              <div class="action-buttons">
+                <button 
+                  pButton 
+                  icon="pi pi-eye" 
+                  class="action-btn btn-view"
+                  pTooltip="View details"
+                  tooltipPosition="top"
+                  (click)="onViewInvoice(invoice.id)">
+                </button>
+                <button 
+                  *ngIf="(invoice.status === 'CREATED' || invoice.status === 'COMPLETED') && invoice.paymentStatus !== 'PAID'"
+                  pButton 
+                  icon="pi pi-dollar" 
+                  class="action-btn btn-payment"
+                  pTooltip="Add payment"
+                  tooltipPosition="top"
+                  (click)="onAddPayment(invoice)">
+                </button>
+                <button 
+                  *ngIf="invoice.status === 'CREATED'"
+                  pButton 
+                  icon="pi pi-times" 
+                  class="action-btn btn-cancel"
+                  pTooltip="Cancel invoice"
+                  tooltipPosition="top"
+                  (click)="onCancelInvoice(invoice.id)">
+                </button>
+              </div>
+            </td>
+          </tr>
+          
+          <tr *ngIf="(filteredInvoices$ | async)?.length === 0" class="no-data-row">
+            <td colspan="8" class="no-data-cell">
+              <div class="no-data-message">
+                <i class="pi pi-file-invoice"></i>
+                <p>No invoices found</p>
+                <button 
+                  pButton 
+                  label="Create First Invoice" 
+                  icon="pi pi-plus" 
+                  class="p-button-sm"
+                  (click)="onCreateInvoice()">
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Payment Dialog - Modern Design (Consistent with Invoice Detail) -->
+  <p-dialog
+    [(visible)]="showPaymentDialog"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [closable]="true"
+    [style]="{width: '480px', maxWidth: '95vw'}"
+    styleClass="modern-payment-dialog">
+    <ng-template pTemplate="header">
+      <div class="dialog-header-content">
+        <div class="header-icon">
+          <i class="pi pi-money-bill"></i>
+        </div>
+        <div class="header-text">
+          <h3>Add Payment</h3>
+          <p>Invoice {{ selectedInvoice?.invoiceNumber }}</p>
+        </div>
+      </div>
+    </ng-template>
+    
+    <div class="payment-dialog-body" *ngIf="selectedInvoice">
+      <div class="payment-summary-card">
+        <div class="summary-row">
+          <span class="label">Invoice Amount</span>
+          <span class="value">{{ formatCurrency(selectedInvoice.netAmount) }}</span>
+        </div>
+        <div class="summary-row" *ngIf="selectedInvoice.paidAmount > 0">
+          <span class="label">Already Paid</span>
+          <span class="value paid">{{ formatCurrency(selectedInvoice.paidAmount) }}</span>
+        </div>
+        <div class="summary-row highlight">
+          <span class="label">Balance Due</span>
+          <span class="value due">{{ formatCurrency(selectedInvoice.netAmount - selectedInvoice.paidAmount) }}</span>
+        </div>
+      </div>
+      
+      <div class="payment-input-section">
+        <label class="input-label">
+          Payment Amount <span class="required">*</span>
+        </label>
+        <p-inputNumber
+          [(ngModel)]="paymentAmount"
+          (ngModelChange)="paymentError = ''"
+          prefix="₹ "
+          [minFractionDigits]="2"
+          [maxFractionDigits]="2"
+          [min]="0.01"
+          placeholder="Enter amount"
+          [showButtons]="false"
+          styleClass="modern-input">
+        </p-inputNumber>
+        <small class="input-hint" *ngIf="!paymentError">
+          Maximum: {{ formatCurrency(selectedInvoice.netAmount - selectedInvoice.paidAmount) }}
+        </small>
+        <small class="field-error" *ngIf="paymentError">
+          <i class="pi pi-exclamation-circle"></i> {{ paymentError }}
+        </small>
+      </div>
+    </div>
+    
+    <ng-template pTemplate="footer">
+      <div class="dialog-footer-actions">
+        <button 
+          pButton 
+          type="button"
+          label="Cancel" 
+          class="p-button-outlined p-button-secondary btn-cancel-modal"
+          (click)="showPaymentDialog = false">
+        </button>
+        <button 
+          pButton 
+          type="button"
+          label="Add Payment" 
+          icon="pi pi-check"
+          class="btn-submit-modal"
+          [disabled]="!paymentAmount || paymentAmount <= 0"
+          (click)="confirmPayment()">
+        </button>
+      </div>
+    </ng-template>
+  </p-dialog>
+</div>

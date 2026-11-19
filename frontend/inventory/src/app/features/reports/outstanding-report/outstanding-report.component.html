@@ -1,0 +1,203 @@
+<div class="report-container">
+  <app-page-header
+    title="Outstanding & AR Report"
+    subtitle="Customer-wise pending dues with 30 / 60 / 90-day aging analysis"
+    icon="exclamation-circle">
+    <div actions class="header-actions">
+      <button class="btn-outline-primary btn-sm"
+        [disabled]="loading || !data?.records?.length"
+        (click)="onExportCsv()">
+        <i class="pi pi-download"></i> Export CSV
+      </button>
+    </div>
+  </app-page-header>
+
+  <!-- ── Filter Row ─────────────────────────────────────────── -->
+  <div class="filter-card">
+    <div class="filter-grid">
+      <div class="filter-item">
+        <label class="filter-label">Customer</label>
+        <p-dropdown [(ngModel)]="selectedCustomerId" [options]="customerOptions"
+          optionLabel="label" optionValue="value"
+          placeholder="All Customers" [filter]="true" filterBy="label"
+          styleClass="rpt-dropdown">
+        </p-dropdown>
+      </div>
+      <div class="filter-actions">
+        <button class="btn-primary" (click)="onApplyFilter()">
+          <i class="pi pi-search"></i> Apply
+        </button>
+        <button class="btn-ghost" (click)="onClearFilter()">
+          <i class="pi pi-times"></i> Clear
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Aging Summary Cards ─────────────────────────────────── -->
+  <div class="kpi-row" *ngIf="!loading && data">
+    <div class="kpi-card kpi-red kpi-highlight">
+      <div class="kpi-icon"><i class="pi pi-exclamation-circle"></i></div>
+      <div class="kpi-body">
+        <div class="kpi-label">Total Outstanding</div>
+        <div class="kpi-value">{{ formatCurrency(data.totalOutstanding) }}</div>
+      </div>
+    </div>
+    <div class="kpi-card kpi-green">
+      <div class="kpi-icon"><i class="pi pi-check-circle"></i></div>
+      <div class="kpi-body">
+        <div class="kpi-label">0–30 Days (Current)</div>
+        <div class="kpi-value">{{ formatCurrency(data.totalBucket0To30) }}</div>
+      </div>
+    </div>
+    <div class="kpi-card kpi-orange">
+      <div class="kpi-icon"><i class="pi pi-clock"></i></div>
+      <div class="kpi-body">
+        <div class="kpi-label">31–60 Days</div>
+        <div class="kpi-value">{{ formatCurrency(data.totalBucket31To60) }}</div>
+      </div>
+    </div>
+    <div class="kpi-card kpi-amber">
+      <div class="kpi-icon"><i class="pi pi-calendar-times"></i></div>
+      <div class="kpi-body">
+        <div class="kpi-label">61–90 Days</div>
+        <div class="kpi-value">{{ formatCurrency(data.totalBucket61To90) }}</div>
+      </div>
+    </div>
+    <div class="kpi-card kpi-crimson">
+      <div class="kpi-icon"><i class="pi pi-ban"></i></div>
+      <div class="kpi-body">
+        <div class="kpi-label">90+ Days (Critical)</div>
+        <div class="kpi-value">{{ formatCurrency(data.totalBucketAbove90) }}</div>
+      </div>
+    </div>
+    <div class="kpi-card kpi-blue">
+      <div class="kpi-icon"><i class="pi pi-users"></i></div>
+      <div class="kpi-body">
+        <div class="kpi-label">Customers with Dues</div>
+        <div class="kpi-value">{{ data.totalCustomers | number }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Skeleton KPIs -->
+  <div class="kpi-row" *ngIf="loading">
+    <div class="kpi-card kpi-skeleton" *ngFor="let i of [1,2,3,4,5,6]">
+      <p-skeleton width="100%" height="64px" borderRadius="10px"></p-skeleton>
+    </div>
+  </div>
+
+  <!-- ── Aging Buckets Chart ──────────────────────────────────── -->
+  <div class="aging-visual" *ngIf="!loading && data">
+    <div class="av-title">Aging Distribution</div>
+    <div class="av-bars">
+      <div class="av-row">
+        <span class="av-label av-current">0–30 Days</span>
+        <div class="av-track">
+          <div class="av-bar av-bar-current" [style.width.%]="agingBarWidth(data.totalBucket0To30)"></div>
+        </div>
+        <span class="av-amount">{{ formatCurrency(data.totalBucket0To30) }}</span>
+      </div>
+      <div class="av-row">
+        <span class="av-label av-warning">31–60 Days</span>
+        <div class="av-track">
+          <div class="av-bar av-bar-warning" [style.width.%]="agingBarWidth(data.totalBucket31To60)"></div>
+        </div>
+        <span class="av-amount">{{ formatCurrency(data.totalBucket31To60) }}</span>
+      </div>
+      <div class="av-row">
+        <span class="av-label av-late">61–90 Days</span>
+        <div class="av-track">
+          <div class="av-bar av-bar-late" [style.width.%]="agingBarWidth(data.totalBucket61To90)"></div>
+        </div>
+        <span class="av-amount">{{ formatCurrency(data.totalBucket61To90) }}</span>
+      </div>
+      <div class="av-row">
+        <span class="av-label av-critical">90+ Days</span>
+        <div class="av-track">
+          <div class="av-bar av-bar-critical" [style.width.%]="agingBarWidth(data.totalBucketAbove90)"></div>
+        </div>
+        <span class="av-amount">{{ formatCurrency(data.totalBucketAbove90) }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Data Table ───────────────────────────────────────────── -->
+  <div class="table-card">
+    <div class="table-info-bar" *ngIf="data && !loading">
+      <span class="record-count">{{ data.records.length }} customer(s) with outstanding dues</span>
+    </div>
+
+    <div class="table-scroll-wrapper">
+      <table class="rpt-table">
+        <thead>
+          <tr>
+            <th class="th-sno">S.NO</th>
+            <th>CUSTOMER</th>
+            <th class="th-center">INVOICES</th>
+            <th class="th-right">TOTAL AMOUNT</th>
+            <th class="th-right">PAID</th>
+            <th class="th-right outstanding-col">OUTSTANDING</th>
+            <th class="th-right">0–30 DAYS</th>
+            <th class="th-right">31–60 DAYS</th>
+            <th class="th-right">61–90 DAYS</th>
+            <th class="th-right critical-col">90+ DAYS</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Skeleton -->
+          <ng-container *ngIf="loading">
+            <tr class="skeleton-row" *ngFor="let i of [1,2,3,4,5,6,7,8]">
+              <td *ngFor="let j of [1,2,3,4,5,6,7,8,9,10]">
+                <p-skeleton height="14px" borderRadius="4px"></p-skeleton>
+              </td>
+            </tr>
+          </ng-container>
+
+          <!-- Data -->
+          <tr *ngFor="let row of data?.records; let i = index" class="data-row">
+            <td class="td-sno">{{ i + 1 }}</td>
+            <td>
+              <span class="customer-name">{{ row.customerName }}</span>
+            </td>
+            <td class="td-center">
+              <span class="invoice-count">{{ row.totalInvoices }}</span>
+            </td>
+            <td class="td-right td-mono">{{ formatCurrency(row.totalAmount) }}</td>
+            <td class="td-right td-mono td-green">{{ formatCurrency(row.paidAmount) }}</td>
+            <td class="td-right td-mono td-bold outstanding-col">
+              {{ formatCurrency(row.balanceAmount) }}
+            </td>
+            <td class="td-right td-mono bucket-current">{{ formatCurrency(row.bucket0To30) }}</td>
+            <td class="td-right td-mono bucket-warning">{{ formatCurrency(row.bucket31To60) }}</td>
+            <td class="td-right td-mono bucket-late">{{ formatCurrency(row.bucket61To90) }}</td>
+            <td class="td-right td-mono bucket-critical critical-col">{{ formatCurrency(row.bucketAbove90) }}</td>
+          </tr>
+
+          <!-- Empty -->
+          <tr *ngIf="!loading && !data?.records?.length">
+            <td colspan="10" class="empty-row">
+              <div class="empty-state">
+                <div class="empty-icon"><i class="pi pi-check-circle"></i></div>
+                <div class="empty-title">No outstanding dues</div>
+                <div class="empty-sub">All invoices are paid up. Great!</div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+
+        <!-- Totals footer -->
+        <tfoot *ngIf="!loading && data?.records?.length">
+          <tr class="totals-row">
+            <td colspan="5" class="totals-label">TOTAL OUTSTANDING</td>
+            <td class="td-right td-mono totals-amount outstanding-col">{{ formatCurrency(data!.totalOutstanding) }}</td>
+            <td class="td-right td-mono bucket-current">{{ formatCurrency(data!.totalBucket0To30) }}</td>
+            <td class="td-right td-mono bucket-warning">{{ formatCurrency(data!.totalBucket31To60) }}</td>
+            <td class="td-right td-mono bucket-late">{{ formatCurrency(data!.totalBucket61To90) }}</td>
+            <td class="td-right td-mono bucket-critical critical-col">{{ formatCurrency(data!.totalBucketAbove90) }}</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+</div>

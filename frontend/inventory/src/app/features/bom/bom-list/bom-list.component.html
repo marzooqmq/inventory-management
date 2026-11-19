@@ -1,0 +1,103 @@
+<div class="bom-list-container">
+  <app-page-header
+    title="Bill of Materials"
+    subtitle="Manage product material requirements"
+    icon="list-check"
+    [showAddButton]="true"
+    addButtonLabel="Add BOM"
+    (onAdd)="onAddBOM()">
+    <div actions class="header-actions">
+      <button class="btn-expand-all" (click)="toggleAll()" pTooltip="{{allExpanded ? 'Collapse All' : 'Expand All'}}" tooltipPosition="bottom">
+        <i class="pi" [ngClass]="allExpanded ? 'pi-minus' : 'pi-plus'"></i>
+        {{ allExpanded ? 'Collapse All' : 'Expand All' }}
+      </button>
+      <div class="search-wrapper">
+        <i class="pi pi-search search-icon"></i>
+        <input 
+          type="text" 
+          [formControl]="searchControl"
+          placeholder="Search by product or material..." 
+          class="modern-search" />
+      </div>
+    </div>
+  </app-page-header>
+
+  <div class="table-wrapper">
+    <ng-container *ngFor="let group of (groupedBOMs$ | async); trackBy: trackByProductId">
+      <div class="product-group" [class.expanded]="group.expanded">
+        <div class="product-group-header" (click)="toggleGroup(group)">
+          <div class="header-left">
+            <button class="expand-btn" [class.expanded]="group.expanded">
+              <i class="pi pi-chevron-right"></i>
+            </button>
+            <div class="product-name">
+              <i class="pi pi-shopping-bag"></i>
+              <span>{{ group.productName }}</span>
+            </div>
+          </div>
+          <div class="material-count">{{ group.materials.length }} Material{{ group.materials.length > 1 ? 's' : '' }}</div>
+        </div>
+
+        <div class="product-group-content" [@slideDown]="group.expanded ? 'expanded' : 'collapsed'">
+          <div class="modern-table-container">
+            <table class="modern-table">
+              <thead>
+                <tr>
+                  <th class="col-sno">S.NO</th>
+                  <th class="col-material">RAW MATERIAL</th>
+                  <th class="col-qty">QTY REQUIRED</th>
+                  <th class="col-actions">ACTIONS</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let bom of group.materials; let i = index; trackBy: trackByBomId" class="table-row">
+                  <td class="cell-sno">
+                    <span class="sno-text">{{ i + 1 }}</span>
+                  </td>
+                  
+                  <td class="cell-material">
+                    <div class="material-text">{{ bom.materialName }}</div>
+                  </td>
+                  
+                  <td class="cell-qty">
+                    <span class="qty-value">{{ bom.qtyRequired | number:'1.0-2' }}</span>
+                  </td>
+                  
+                  <td class="cell-actions">
+                    <div class="action-group">
+                      <button class="btn-action btn-edit" (click)="onEdit(bom.id)" 
+                              pTooltip="Edit" tooltipPosition="top">
+                        <i class="pi pi-pencil"></i>
+                      </button>
+                      <button class="btn-action btn-delete" (click)="onDelete(bom)" 
+                              pTooltip="Delete" tooltipPosition="top">
+                        <i class="pi pi-trash"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- Empty State -->
+    <div *ngIf="(groupedBOMs$ | async)?.length === 0 && !(loading$ | async)" class="empty-state-wrapper">
+      <div class="empty-state">
+        <div class="empty-icon">
+          <i class="pi pi-list-check"></i>
+        </div>
+        <h3 class="empty-title">No Bill of Materials Found</h3>
+        <p class="empty-text">Get started by creating your first BOM</p>
+        <button class="btn-primary-empty" (click)="onAddBOM()">
+          <i class="pi pi-plus"></i>
+          Add BOM
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-confirm-dialog></app-confirm-dialog>

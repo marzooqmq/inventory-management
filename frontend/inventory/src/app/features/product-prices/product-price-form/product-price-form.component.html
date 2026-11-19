@@ -1,0 +1,105 @@
+<div class="product-price-form-container">
+  <app-page-header
+    [title]="isEditMode ? 'Edit Product Price' : 'Add New Product Price'"
+    [subtitle]="isEditMode ? 'Update customer-specific pricing details' : 'Create a new customer-specific price'"
+    icon="tag">
+  </app-page-header>
+
+  <div class="form-card">
+    <p-card>
+      <form [formGroup]="productPriceForm" (ngSubmit)="onSubmit()">
+        <div class="form-grid">
+          <!-- Product -->
+          <div class="form-field full-width">
+            <label for="productId" class="field-label">
+              Product <span class="required">*</span>
+            </label>
+            <p-dropdown
+              id="productId"
+              formControlName="productId"
+              [options]="(products$ | async) || []"
+              optionLabel="name"
+              optionValue="id"
+              placeholder="Select product"
+              [showClear]="true"
+              [filter]="true"
+              filterBy="name"
+              [class.invalid]="isFieldInvalid('productId')">
+            </p-dropdown>
+            <small class="error-message" *ngIf="isFieldInvalid('productId')">
+              {{ getErrorMessage('productId') }}
+            </small>
+          </div>
+
+          <!-- Customer Type -->
+          <div class="form-field">
+            <label for="customerType" class="field-label">
+              Customer Type <span class="required">*</span>
+            </label>
+            <p-dropdown
+              id="customerType"
+              formControlName="customerType"
+              [options]="customerTypes"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="Select customer type"
+              [showClear]="true"
+              [class.invalid]="isFieldInvalid('customerType')">
+            </p-dropdown>
+            <small class="field-help">Choose the customer category for this price</small>
+            <small class="error-message" *ngIf="isFieldInvalid('customerType')">
+              {{ getErrorMessage('customerType') }}
+            </small>
+          </div>
+
+          <!-- Price Per Box -->
+          <div class="form-field">
+            <label for="pricePerBox" class="field-label">
+              Price Per Box <span class="required">*</span>
+            </label>
+            <p-inputNumber
+              id="pricePerBox"
+              formControlName="pricePerBox"
+              mode="currency"
+              currency="INR"
+              locale="en-IN"
+              [min]="0"
+              [minFractionDigits]="2"
+              [maxFractionDigits]="2"
+              buttonLayout="stacked"
+              [showButtons]="true"
+              [class.invalid]="isFieldInvalid('pricePerBox')">
+            </p-inputNumber>
+            <small class="field-help">Selling price for this customer type</small>
+            <small class="error-message" *ngIf="isFieldInvalid('pricePerBox')">
+              {{ getErrorMessage('pricePerBox') }}
+            </small>
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <button
+            pButton
+            pRipple
+            type="button"
+            label="Cancel"
+            icon="pi pi-times"
+            class="p-button-text p-button-secondary"
+            (click)="onCancel()">
+          </button>
+          <button
+            pButton
+            pRipple
+            type="submit"
+            [label]="isEditMode ? 'Update Price' : 'Create Price'"
+            icon="pi pi-check"
+            class="p-button-primary"
+            [loading]="(loading$ | async) ?? false"
+            [disabled]="productPriceForm.invalid">
+          </button>
+        </div>
+      </form>
+    </p-card>
+  </div>
+</div>

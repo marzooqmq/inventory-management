@@ -1,0 +1,237 @@
+﻿<div class="report-container">
+
+  <div class="page-header">
+    <div class="page-header-left">
+      <h1 class="page-title">Production vs Sales</h1>
+      <p class="page-sub">Compare production output against sales across products and months</p>
+    </div>
+  </div>
+
+  <!-- Filter Card -->
+  <div class="filter-card">
+    <div class="filter-grid">
+      <div class="filter-item">
+        <label class="filter-label">Start Date <span class="required">*</span></label>
+        <p-calendar [(ngModel)]="startDate" dateFormat="yy-mm-dd" [showIcon]="true" placeholder="YYYY-MM-DD" styleClass="rpt-calendar" appendTo="body" />
+      </div>
+      <div class="filter-item">
+        <label class="filter-label">End Date <span class="required">*</span></label>
+        <p-calendar [(ngModel)]="endDate" dateFormat="yy-mm-dd" [showIcon]="true" placeholder="YYYY-MM-DD" styleClass="rpt-calendar" appendTo="body" />
+      </div>
+      <div class="filter-item">
+        <label class="filter-label">Product</label>
+        <p-dropdown [options]="productOptions" [(ngModel)]="selectedProductId" optionLabel="label" optionValue="value" styleClass="rpt-dropdown" appendTo="body" [filter]="true" filterPlaceholder="Search product" placeholder="All Products" />
+      </div>
+      <div class="filter-actions">
+        <button class="btn-primary" [disabled]="datesRequired" (click)="onApplyFilters()">
+          <i class="pi pi-search"></i> Apply
+        </button>
+        <button class="btn-ghost" (click)="onClearFilters()">
+          <i class="pi pi-times"></i> Clear
+        </button>
+      </div>
+    </div>
+    <p class="required-hint" *ngIf="datesRequired">
+      <i class="pi pi-info-circle"></i> Both Start Date and End Date are required.
+    </p>
+  </div>
+
+  <!-- Tab Bar -->
+  <div class="tab-bar">
+    <button class="tab-btn" [class.tab-active]="activeTab === 'summary'" (click)="setTab('summary')">
+      <i class="pi pi-table"></i> Summary
+    </button>
+    <button class="tab-btn" [class.tab-active]="activeTab === 'monthly'" (click)="setTab('monthly')">
+      <i class="pi pi-calendar"></i> Monthly Trend
+    </button>
+  </div>
+
+  <!-- ══════════════════ SUMMARY TAB ══════════════════ -->
+  <ng-container *ngIf="activeTab === 'summary'">
+    <!-- KPIs -->
+    <div class="kpi-row" *ngIf="summaryResponse && !summaryLoading">
+      <div class="kpi-card kpi-blue">
+        <div class="kpi-icon"><i class="pi pi-box"></i></div>
+        <div class="kpi-body">
+          <div class="kpi-label">Total Produced</div>
+          <div class="kpi-value">{{ summaryResponse.totalProducedQty | number }} boxes</div>
+        </div>
+      </div>
+      <div class="kpi-card kpi-green">
+        <div class="kpi-icon"><i class="pi pi-shopping-cart"></i></div>
+        <div class="kpi-body">
+          <div class="kpi-label">Total Sold</div>
+          <div class="kpi-value">{{ summaryResponse.totalSoldQty | number }} boxes</div>
+        </div>
+      </div>
+      <div class="kpi-card kpi-cyan kpi-highlight">
+        <div class="kpi-icon"><i class="pi pi-warehouse"></i></div>
+        <div class="kpi-body">
+          <div class="kpi-label">Closing Stock</div>
+          <div class="kpi-value">{{ summaryResponse.totalClosingStock | number }} boxes</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-card" *ngIf="datesRequired">
+      <i class="pi pi-info-circle"></i>
+      <span>Select a date range and click <strong>Apply</strong> to load the report.</span>
+    </div>
+
+    <div class="table-card" *ngIf="!datesRequired">
+      <div class="table-info-bar">
+        <span class="record-count">{{ summaryRecords.length }} product(s)</span>
+      </div>
+      <div class="table-scroll-wrapper">
+        <table class="rpt-table">
+          <thead>
+            <tr>
+              <th class="th-sno">S.NO</th>
+              <th>PRODUCT</th>
+              <th class="th-right">PRODUCED QTY (BOXES)</th>
+              <th class="th-right">SOLD QTY (BOXES)</th>
+              <th class="th-right">CLOSING STOCK (BOXES)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container *ngIf="summaryLoading">
+              <tr class="skeleton-row" *ngFor="let s of [1,2,3,4,5]">
+                <td *ngFor="let c of [1,2,3,4,5]"><p-skeleton height="1rem" /></td>
+              </tr>
+            </ng-container>
+            <ng-container *ngIf="!summaryLoading">
+              <tr *ngFor="let row of summaryRecords; let i = index">
+                <td class="td-sno td-center">{{ i + 1 }}</td>
+                <td class="td-primary-text">{{ row.productName }}</td>
+                <td class="td-right td-num td-blue">{{ row.producedQty | number }}</td>
+                <td class="td-right td-num td-green">{{ row.soldQty | number }}</td>
+                <td class="td-right td-num td-bold" [ngClass]="stockClass(row.closingStock)">{{ row.closingStock | number }}</td>
+              </tr>
+              <!-- Totals Row -->
+              <tr class="totals-row" *ngIf="summaryResponse && summaryRecords.length > 0">
+                <td colspan="2" class="totals-label">TOTAL</td>
+                <td class="td-right td-num td-bold">{{ summaryResponse.totalProducedQty | number }}</td>
+                <td class="td-right td-num td-bold">{{ summaryResponse.totalSoldQty | number }}</td>
+                <td class="td-right td-num td-bold" [ngClass]="stockClass(summaryResponse.totalClosingStock)">{{ summaryResponse.totalClosingStock | number }}</td>
+              </tr>
+              <tr *ngIf="summaryRecords.length === 0 && !summaryLoading">
+                <td colspan="5">
+                  <div class="empty-state">
+                    <div class="empty-icon"><i class="pi pi-inbox"></i></div>
+                    <div class="empty-title">No records found</div>
+                    <div class="empty-sub">Adjust filters and try again</div>
+                  </div>
+                </td>
+              </tr>
+            </ng-container>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- ══════════════════ MONTHLY TAB ══════════════════ -->
+  <ng-container *ngIf="activeTab === 'monthly'">
+    <!-- KPIs -->
+    <div class="kpi-row" *ngIf="monthlyResponse && !monthlyLoading">
+      <div class="kpi-card kpi-blue">
+        <div class="kpi-icon"><i class="pi pi-box"></i></div>
+        <div class="kpi-body">
+          <div class="kpi-label">Total Produced</div>
+          <div class="kpi-value">{{ monthlyResponse.totalProduced | number }} boxes</div>
+        </div>
+      </div>
+      <div class="kpi-card kpi-green">
+        <div class="kpi-icon"><i class="pi pi-shopping-cart"></i></div>
+        <div class="kpi-body">
+          <div class="kpi-label">Total Sold</div>
+          <div class="kpi-value">{{ monthlyResponse.totalSold | number }} boxes</div>
+        </div>
+      </div>
+      <div class="kpi-card kpi-cyan kpi-highlight">
+        <div class="kpi-icon"><i class="pi pi-warehouse"></i></div>
+        <div class="kpi-body">
+          <div class="kpi-label">Stock Available</div>
+          <div class="kpi-value">{{ monthlyResponse.stockAvailable | number }} boxes</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-card" *ngIf="datesRequired">
+      <i class="pi pi-info-circle"></i>
+      <span>Select a date range and click <strong>Apply</strong> to load the report.</span>
+    </div>
+
+    <div class="monthly-layout" *ngIf="!datesRequired">
+      <!-- Monthly Records Table -->
+      <div class="table-card monthly-main">
+        <div class="table-info-bar">
+          <span class="record-count">Monthly Breakdown &nbsp;·&nbsp; {{ monthlyRecords.length }} record(s)</span>
+        </div>
+        <div class="table-scroll-wrapper">
+          <table class="rpt-table">
+            <thead>
+              <tr>
+                <th class="th-sno">S.NO</th>
+                <th>PRODUCT</th>
+                <th class="th-center">MONTH</th>
+                <th class="th-right">PRODUCED</th>
+                <th class="th-right">SOLD</th>
+                <th class="th-right">NET QTY</th>
+                <th class="th-right">CUM. STOCK</th>
+              </tr>
+            </thead>
+            <tbody>
+              <ng-container *ngIf="monthlyLoading">
+                <tr class="skeleton-row" *ngFor="let s of [1,2,3,4,5,6]">
+                  <td *ngFor="let c of [1,2,3,4,5,6,7]"><p-skeleton height="1rem" /></td>
+                </tr>
+              </ng-container>
+              <ng-container *ngIf="!monthlyLoading">
+                <tr *ngFor="let row of monthlyRecords; let i = index">
+                  <td class="td-sno td-center">{{ i + 1 }}</td>
+                  <td class="td-primary-text">{{ row.productName }}</td>
+                  <td class="td-center"><span class="month-badge">{{ row.yearMonth }}</span></td>
+                  <td class="td-right td-num td-blue">{{ row.producedQty | number }}</td>
+                  <td class="td-right td-num td-green">{{ row.soldQty | number }}</td>
+                  <td class="td-right td-num td-bold" [ngClass]="stockClass(row.netQty)">{{ row.netQty | number }}</td>
+                  <td class="td-right td-num" [ngClass]="stockClass(row.cumulativeStock)">{{ row.cumulativeStock | number }}</td>
+                </tr>
+                <tr *ngIf="monthlyRecords.length === 0 && !monthlyLoading">
+                  <td colspan="7">
+                    <div class="empty-state">
+                      <div class="empty-icon"><i class="pi pi-inbox"></i></div>
+                      <div class="empty-title">No monthly records found</div>
+                      <div class="empty-sub">Adjust date range and try again</div>
+                    </div>
+                  </td>
+                </tr>
+              </ng-container>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Product Summary Cards -->
+      <div class="product-summary-panel" *ngIf="productSummaries.length > 0">
+        <div class="panel-title">Product Summary</div>
+        <div class="summary-card" *ngFor="let ps of productSummaries">
+          <div class="sc-name">{{ ps.productName }}</div>
+          <div class="sc-row">
+            <span class="sc-key">Produced</span>
+            <span class="sc-val sc-blue">{{ ps.totalProduced | number }}</span>
+          </div>
+          <div class="sc-row">
+            <span class="sc-key">Sold</span>
+            <span class="sc-val sc-green">{{ ps.totalSold | number }}</span>
+          </div>
+          <div class="sc-row sc-row-total">
+            <span class="sc-key">Stock</span>
+            <span class="sc-val" [ngClass]="stockClass(ps.stockAvailable)">{{ ps.stockAvailable | number }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+</div>

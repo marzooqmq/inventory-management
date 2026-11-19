@@ -1,0 +1,205 @@
+<div class="customer-form-container">
+  <app-page-header
+    [title]="isEditMode ? 'Edit Customer' : 'Add New Customer'"
+    [subtitle]="isEditMode ? 'Update customer information' : 'Create a new customer profile'"
+    icon="user-plus">
+  </app-page-header>
+
+  <div class="form-content">
+    <p-card>
+      <form [formGroup]="customerForm" (ngSubmit)="onSubmit()">
+        
+        <!-- Basic Information Section -->
+        <div class="form-section">
+          <h3 class="section-title">
+            <i class="pi pi-user"></i>
+            Basic Information
+          </h3>
+          
+          <div class="form-grid">
+            <div class="form-field">
+              <label for="name" class="field-label">
+                Customer Name <span class="required">*</span>
+              </label>
+              <input
+                id="name"
+                type="text"
+                pInputText
+                formControlName="name"
+                placeholder="Enter customer name"
+                [class.p-invalid]="isFieldInvalid('name')"
+                class="p-inputtext-lg" />
+              <small class="p-error" *ngIf="isFieldInvalid('name')">
+                {{ getFieldError('name') }}
+              </small>
+            </div>
+
+            <div class="form-field">
+              <label for="phone" class="field-label">
+                Phone Number <span class="required">*</span>
+              </label>
+              <input
+                id="phone"
+                type="text"
+                pInputText
+                formControlName="phone"
+                placeholder="10-digit phone number"
+                maxlength="10"
+                [class.p-invalid]="isFieldInvalid('phone')"
+                class="p-inputtext-lg" />
+              <small class="p-error" *ngIf="isFieldInvalid('phone')">
+                {{ getFieldError('phone') }}
+              </small>
+            </div>
+
+            <div class="form-field">
+              <label for="type" class="field-label">
+                Customer Type <span class="required">*</span>
+              </label>
+              <p-dropdown
+                id="type"
+                formControlName="type"
+                [options]="customerTypes"
+                placeholder="Select customer type"
+                [class.p-invalid]="isFieldInvalid('type')"
+                styleClass="p-inputtext-lg">
+              </p-dropdown>
+              <small class="p-error" *ngIf="isFieldInvalid('type')">
+                {{ getFieldError('type') }}
+              </small>
+              <small class="field-hint">
+                <i class="pi pi-info-circle"></i>
+                Distributors buy in cases, others buy in boxes
+              </small>
+            </div>
+
+            <div class="form-field">
+              <label for="discount" class="field-label">
+                Default Discount (%)
+              </label>
+              <p-inputNumber
+                id="discount"
+                formControlName="discount"
+                [min]="0"
+                [max]="100"
+                suffix="%"
+                placeholder="0"
+                [class.p-invalid]="isFieldInvalid('discount')"
+                styleClass="p-inputtext-lg">
+              </p-inputNumber>
+              <small class="p-error" *ngIf="isFieldInvalid('discount')">
+                {{ getFieldError('discount') }}
+              </small>
+              <small class="field-hint">
+                <i class="pi pi-info-circle"></i>
+                Auto-applied discount on all invoices
+              </small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Address Information Section -->
+        <div class="form-section">
+          <h3 class="section-title">
+            <i class="pi pi-map-marker"></i>
+            Address Information
+          </h3>
+          
+          <div class="form-grid">
+            <div class="form-field full-width">
+              <label for="address" class="field-label">
+                Street Address
+              </label>
+              <textarea
+                id="address"
+                pInputTextarea
+                formControlName="address"
+                placeholder="Enter complete address"
+                rows="3"
+                [class.p-invalid]="isFieldInvalid('address')"
+                class="p-inputtext-lg">
+              </textarea>
+            </div>
+
+            <div class="form-field">
+              <label for="district" class="field-label">
+                District / City
+              </label>
+              <input
+                id="district"
+                type="text"
+                pInputText
+                formControlName="district"
+                placeholder="Enter district or city"
+                class="p-inputtext-lg" />
+            </div>
+
+            <div class="form-field">
+              <label for="state" class="field-label">
+                State
+              </label>
+              <input
+                id="state"
+                type="text"
+                pInputText
+                formControlName="state"
+                placeholder="Enter state"
+                class="p-inputtext-lg" />
+            </div>
+
+            <div class="form-field">
+              <label for="country" class="field-label">
+                Country
+              </label>
+              <input
+                id="country"
+                type="text"
+                pInputText
+                formControlName="country"
+                placeholder="Enter country"
+                class="p-inputtext-lg" />
+            </div>
+
+            <div class="form-field">
+              <label for="zipCode" class="field-label">
+                PIN Code
+              </label>
+              <input
+                id="zipCode"
+                type="text"
+                pInputText
+                formControlName="zipCode"
+                placeholder="6-digit PIN"
+                maxlength="6"
+                [class.p-invalid]="isFieldInvalid('zipCode')"
+                class="p-inputtext-lg" />
+              <small class="p-error" *ngIf="isFieldInvalid('zipCode')">
+                {{ getFieldError('zipCode') }}
+              </small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <button
+            pButton
+            type="button"
+            label="Cancel"
+            icon="pi pi-times"
+            class="p-button-outlined p-button-secondary"
+            (click)="onCancel()">
+          </button>
+          <button
+            pButton
+            type="submit"
+            [label]="isEditMode ? 'Update Customer' : 'Create Customer'"
+            [icon]="isEditMode ? 'pi pi-check' : 'pi pi-plus'"
+            [loading]="(loading$ | async) ?? false"
+            [disabled]="customerForm.invalid">
+          </button>
+        </div>
+      </form>
+    </p-card>
+  </div>
+</div>

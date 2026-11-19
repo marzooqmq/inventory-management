@@ -1,0 +1,217 @@
+<div class="customer-list-container">
+  <app-page-header
+    title="Customers"
+    subtitle="Manage your customer database"
+    icon="users">
+    <div actions class="search-wrapper">
+      <i class="pi pi-search search-icon"></i>
+      <input 
+        type="text" 
+        [formControl]="searchControl"
+        placeholder="Search customers by name, phone, type..." 
+        class="modern-search" />
+    </div>
+  </app-page-header>
+
+  <!-- Customers Table -->
+  <div class="table-wrapper">
+    <div class="modern-table-container">
+      <table class="modern-table">
+        <thead>
+          <tr>
+            <th class="cell-index">S.NO.</th>
+            <th class="cell-customer">CUSTOMER</th>
+            <th class="cell-contact">CONTACT</th>
+            <th class="cell-type">TYPE</th>
+            <th class="cell-location">LOCATION</th>
+            <th class="cell-discount">DISCOUNT</th>
+            <th class="cell-actions">ACTIONS</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let customer of (filteredCustomers$ | async); let i = index" class="table-row">
+            <td class="cell-index">
+              <span class="sno-text">{{ i + 1 }}</span>
+            </td>
+            
+            <td class="cell-customer">
+              <div class="customer-info">
+                <div class="customer-name">{{ customer.name }}</div>
+                <div class="customer-id" *ngIf="customer.id">
+                  ID: #{{ customer.id }}
+                </div>
+              </div>
+            </td>
+            
+            <td class="cell-contact">
+              <div class="contact-info">
+                <div class="phone">
+                  <i class="pi pi-phone"></i>
+                  {{ customer.phone }}
+                </div>
+                <div class="address" *ngIf="customer.address">
+                  <i class="pi pi-map-marker"></i>
+                  {{ customer.address }}
+                </div>
+              </div>
+            </td>
+            
+            <td class="cell-type">
+              <p-tag 
+                [value]="getCustomerTypeLabel(customer.type)" 
+                [severity]="getCustomerTypeSeverity(customer.type)">
+              </p-tag>
+            </td>
+            
+            <td class="cell-location">
+              <div class="location-info">
+                <span *ngIf="customer.district">{{ customer.district }}</span>
+                <span *ngIf="customer.state">, {{ customer.state }}</span>
+                <div *ngIf="customer.zipCode" class="zip-code">
+                  <i class="pi pi-home"></i> {{ customer.zipCode }}
+                </div>
+              </div>
+            </td>
+            
+            <td class="cell-discount">
+              <span class="discount-badge" *ngIf="customer.discount">
+                {{ customer.discount }}%
+              </span>
+              <span class="no-discount" *ngIf="!customer.discount">-</span>
+            </td>
+            
+            <td class="cell-actions">
+              <div class="action-buttons">
+                <button
+                  pButton
+                  icon="pi pi-pencil"
+                  class="action-btn btn-edit"
+                  pTooltip="Edit customer"
+                  tooltipPosition="top"
+                  (click)="onEditCustomer(customer)">
+                </button>
+                <button
+                  pButton
+                  icon="pi pi-trash"
+                  class="action-btn btn-delete"
+                  pTooltip="Delete customer"
+                  tooltipPosition="top"
+                  (click)="onDeleteCustomer(customer)">
+                </button>
+              </div>
+            </td>
+          </tr>
+          
+          <tr *ngIf="(filteredCustomers$ | async)?.length === 0" class="no-data-row">
+            <td colspan="7" class="no-data-cell">
+              <div class="no-data-message">
+                <i class="pi pi-users"></i>
+                <p>No customers found. Customers are added when creating an invoice.</p>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <app-confirm-dialog></app-confirm-dialog>
+</div>
+
+<!-- ===== Edit Customer Dialog ===== -->
+<p-dialog
+  [(visible)]="showEditDialog"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{width: '700px', maxWidth: '95vw'}">
+
+  <ng-template pTemplate="header">
+    <div class="dialog-header-custom">
+      <div class="dialog-title">
+        <i class="pi pi-user-edit"></i>
+        <span>Edit Customer</span>
+      </div>
+      <span class="dialog-subtitle">Update the customer's profile information</span>
+    </div>
+  </ng-template>
+
+  <form [formGroup]="editCustomerForm">
+    <div class="dialog-form-grid">
+
+      <div class="dialog-form-field">
+        <label>Name <span class="required">*</span></label>
+        <input pInputText formControlName="name" placeholder="Enter customer name" />
+      </div>
+
+      <div class="dialog-form-field">
+        <label>Phone <span class="required">*</span></label>
+        <input pInputText formControlName="phone" placeholder="10-digit phone number" />
+      </div>
+
+      <div class="dialog-form-field full-width">
+        <label>Address</label>
+        <textarea pInputTextarea formControlName="address" placeholder="Enter full address" rows="2"></textarea>
+      </div>
+
+      <div class="dialog-form-field">
+        <label>District</label>
+        <input pInputText formControlName="district" placeholder="Enter district" />
+      </div>
+
+      <div class="dialog-form-field">
+        <label>State</label>
+        <input pInputText formControlName="state" placeholder="Enter state" />
+      </div>
+
+      <div class="dialog-form-field">
+        <label>Country</label>
+        <input pInputText formControlName="country" placeholder="Enter country" />
+      </div>
+
+      <div class="dialog-form-field">
+        <label>PIN Code</label>
+        <input pInputText formControlName="zipCode" placeholder="6-digit PIN code" maxlength="6" />
+      </div>
+
+      <div class="dialog-form-field">
+        <label>Customer Type <span class="required">*</span></label>
+        <p-dropdown
+          formControlName="type"
+          [options]="customerTypeOptions"
+          placeholder="Select type"
+          optionLabel="label"
+          optionValue="value"
+          appendTo="body">
+        </p-dropdown>
+      </div>
+
+      <div class="dialog-form-field">
+        <label>Default Discount (%)</label>
+        <p-inputNumber formControlName="discount" [min]="0" [max]="100" suffix="%"></p-inputNumber>
+      </div>
+
+    </div>
+  </form>
+
+  <ng-template pTemplate="footer">
+    <button
+      pButton
+      type="button"
+      label="Cancel"
+      icon="pi pi-times"
+      class="p-button-outlined p-button-secondary customer-cancel-btn"
+      (click)="showEditDialog = false">
+    </button>
+    <button
+      pButton
+      type="button"
+      label="Save Changes"
+      icon="pi pi-check"
+      class="customer-save-btn"
+      [loading]="editingSaving"
+      [disabled]="editCustomerForm.invalid"
+      (click)="onSaveCustomer()">
+    </button>
+  </ng-template>
+</p-dialog>

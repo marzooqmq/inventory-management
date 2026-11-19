@@ -1,0 +1,100 @@
+<div class="product-conversion-form-container">
+  <app-page-header
+    [title]="isEditMode ? 'Edit Product Conversion' : 'Add New Product Conversion'"
+    [subtitle]="isEditMode ? 'Update unit packaging conversion details' : 'Create a new unit packaging conversion'"
+    icon="sync">
+  </app-page-header>
+
+  <div class="form-card">
+    <p-card>
+      <form [formGroup]="productConversionForm" (ngSubmit)="onSubmit()">
+        <div class="form-grid">
+          <!-- Product -->
+          <div class="form-field full-width">
+            <label for="productId" class="field-label">
+              Product <span class="required">*</span>
+            </label>
+            <p-dropdown
+              id="productId"
+              formControlName="productId"
+              [options]="(products$ | async) || []"
+              optionLabel="name"
+              optionValue="id"
+              placeholder="Select product"
+              [showClear]="true"
+              [filter]="true"
+              filterBy="name"
+              [class.invalid]="isFieldInvalid('productId')">
+            </p-dropdown>
+            <small class="error-message" *ngIf="isFieldInvalid('productId')">
+              {{ getErrorMessage('productId') }}
+            </small>
+          </div>
+
+          <!-- Unit Name -->
+          <div class="form-field">
+            <label for="unitName" class="field-label">
+              Unit Type <span class="required">*</span>
+            </label>
+            <p-dropdown
+              id="unitName"
+              formControlName="unitName"
+              [options]="unitTypes"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="Select unit type"
+              [showClear]="true"
+              [class.invalid]="isFieldInvalid('unitName')">
+            </p-dropdown>
+            <small class="field-help">Select the unit of measure for packaging</small>
+            <small class="error-message" *ngIf="isFieldInvalid('unitName')">
+              {{ getErrorMessage('unitName') }}
+            </small>
+          </div>
+
+          <!-- Boxes Per Unit -->
+          <div class="form-field">
+            <label for="boxesPerUnit" class="field-label">
+              Boxes Per Unit <span class="required">*</span>
+            </label>
+            <p-inputNumber
+              id="boxesPerUnit"
+              formControlName="boxesPerUnit"
+              [min]="1"
+              [showButtons]="true"
+              buttonLayout="stacked"
+              [class.invalid]="isFieldInvalid('boxesPerUnit')">
+            </p-inputNumber>
+            <small class="field-help">How many boxes are in one unit?</small>
+            <small class="error-message" *ngIf="isFieldInvalid('boxesPerUnit')">
+              {{ getErrorMessage('boxesPerUnit') }}
+            </small>
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <button
+            pButton
+            pRipple
+            type="button"
+            label="Cancel"
+            icon="pi pi-times"
+            class="p-button-text p-button-secondary"
+            (click)="onCancel()">
+          </button>
+          <button
+            pButton
+            pRipple
+            type="submit"
+            [label]="isEditMode ? 'Update Conversion' : 'Create Conversion'"
+            icon="pi pi-check"
+            class="p-button-primary"
+            [loading]="(loading$ | async) ?? false"
+            [disabled]="productConversionForm.invalid">
+          </button>
+        </div>
+      </form>
+    </p-card>
+  </div>
+</div>

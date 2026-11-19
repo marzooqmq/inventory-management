@@ -1,0 +1,127 @@
+<button
+  type="button"
+  class="mobile-menu-trigger"
+  aria-label="Open navigation menu"
+  [attr.aria-expanded]="isMobileOpen"
+  (click)="toggleMobileMenu()">
+  <i class="pi pi-bars"></i>
+</button>
+
+<button
+  *ngIf="isMobileOpen"
+  type="button"
+  class="mobile-backdrop"
+  aria-label="Close navigation menu"
+  (click)="closeMobileMenu()">
+</button>
+
+<aside class="sidebar" [class.collapsed]="isCollapsed" [class.mobile-open]="isMobileOpen" (keydown.escape)="onEscapeKey()">
+  <div class="sidebar-header">
+    <a class="brand-link" routerLink="/dashboard" (click)="closeMobileMenu()" aria-label="Way2Care home">
+      <span class="brand-mark"><i class="pi pi-box"></i></span>
+      <span class="brand-copy" *ngIf="!isCollapsed">
+        <strong>Way2Care</strong>
+        <small>Inventory Management</small>
+      </span>
+    </a>
+    <button class="toggle-btn" type="button" (click)="toggleSidebar()" [attr.aria-label]="isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'">
+      <i [class]="isCollapsed ? 'pi pi-angle-right' : 'pi pi-angle-left'" aria-hidden="true"></i>
+    </button>
+    <button class="mobile-close-btn" type="button" (click)="closeMobileMenu()" aria-label="Close navigation menu">
+      <i class="pi pi-times" aria-hidden="true"></i>
+    </button>
+  </div>
+
+  <nav class="sidebar-nav" aria-label="Main navigation">
+    <div class="nav-caption" *ngIf="!isCollapsed">WORKSPACE</div>
+    <ul class="menu-list">
+      <li *ngFor="let item of getVisibleMenuItems()" class="menu-item"
+          [class.has-children]="item.children && hasVisibleChildren(item)"
+          [class.admin-item]="item.label === 'Settings'">
+        <!-- Menu item with children (Group) -->
+        <div *ngIf="item.children && hasVisibleChildren(item)" class="menu-group">
+          <button
+            type="button"
+            class="menu-link menu-parent"
+            [class.parent-active]="isParentActive(item)"
+            [attr.aria-expanded]="item.expanded"
+            (click)="toggleMenuItem(item, $event)"
+            (mouseenter)="onFlyoutMouseEnter(item, $event)"
+            (mouseleave)="isCollapsed && hideFlyoutMenuDelayed()"
+            [attr.data-tooltip]="item.label"
+            [title]="isCollapsed ? item.label : ''">
+            <span class="menu-icon-wrapper">
+              <i [class]="item.icon + ' menu-icon'"></i>
+            </span>
+            <span class="menu-label" *ngIf="!isCollapsed">{{ item.label }}</span>
+            <i *ngIf="!isCollapsed" [class]="item.expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'" class="menu-arrow" aria-hidden="true"></i>
+          </button>
+          <ul class="submenu" *ngIf="item.expanded && !isCollapsed">
+            <li *ngFor="let child of item.children" class="submenu-item">
+              <a 
+                *ngIf="hasAccess(child.roles)"
+                [routerLink]="child.route" 
+                routerLinkActive="active"
+                [routerLinkActiveOptions]="{ exact: false }"
+                class="menu-link submenu-link"
+                (click)="closeMobileMenu()">
+                <i [class]="child.icon + ' menu-icon'"></i>
+                <span class="menu-label">{{ child.label }}</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Regular menu item without children -->
+        <a 
+          *ngIf="!item.children && item.route"
+          [routerLink]="item.route" 
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{exact: item.route === '/dashboard'}"
+          class="menu-link"
+          [attr.data-tooltip]="item.label"
+          [title]="isCollapsed ? item.label : ''"
+          (click)="closeMobileMenu()">
+          <span class="menu-icon-wrapper">
+            <i [class]="item.icon + ' menu-icon'"></i>
+          </span>
+          <span class="menu-label" *ngIf="!isCollapsed">{{ item.label }}</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <div class="sidebar-footer">
+    <span class="role-mark"><i class="pi pi-shield"></i></span>
+    <span class="role-copy" *ngIf="!isCollapsed">
+      <small>Signed in as</small>
+      <strong>{{ roleDisplayName() }}</strong>
+    </span>
+  </div>
+</aside>
+
+<!-- Flyout Menu for Collapsed Sidebar -->
+<div class="flyout-menu" 
+     *ngIf="flyoutMenu && isCollapsed" 
+     [style.top.px]="flyoutMenuPosition.top"
+     [style.left.px]="flyoutMenuPosition.left"
+     (mouseenter)="keepFlyoutOpen()"
+     (mouseleave)="hideFlyoutMenuDelayed()">
+  <div class="flyout-header">
+    <i [class]="flyoutMenu.icon"></i>
+    <span>{{ flyoutMenu.label }}</span>
+  </div>
+  <ul class="flyout-list">
+    <li *ngFor="let child of flyoutMenu.children" class="flyout-item">
+      <a 
+        *ngIf="hasAccess(child.roles)"
+        [routerLink]="child.route" 
+        routerLinkActive="active"
+        (click)="hideFlyoutMenu()"
+        class="flyout-link">
+        <i [class]="child.icon"></i>
+        <span>{{ child.label }}</span>
+      </a>
+    </li>
+  </ul>
+</div>

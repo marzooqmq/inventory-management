@@ -1,0 +1,246 @@
+/* ===== Customer Form — Consistent Design System ===== */
+
+.customer-form-container {
+  padding: 1.5rem;
+  max-width: 1100px;
+}
+
+.form-content {
+  margin-top: 1.5rem;
+}
+
+/* ── Card ─────────────────────────────────────────── */
+:host ::ng-deep .p-card {
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.07), 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+:host ::ng-deep .p-card .p-card-body {
+  padding: 2rem;
+}
+
+:host ::ng-deep .p-card .p-card-content {
+  padding: 0;
+}
+
+.form-content {
+  margin-top: 1.5rem;
+}
+
+/* ── Sections ─────────────────────────────────────── */
+.form-section {
+  margin-bottom: 2rem;
+}
+
+.form-section:last-of-type {
+  margin-bottom: 0;
+}
+
+.section-title {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 1.5rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding-bottom: 0.875rem;
+  border-bottom: 2px solid #f1f5f9;
+  letter-spacing: 0.01em;
+}
+
+.section-title i {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(8, 145, 178, 0.1);
+  color: #0891b2;
+  border-radius: 8px;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+/* ── Form Grid & Fields ───────────────────────────── */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.form-field.full-width {
+  grid-column: 1 / -1;
+}
+
+.field-label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #374151;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  letter-spacing: 0.01em;
+}
+
+.required {
+  color: #dc2626;
+  font-size: 0.875rem;
+}
+
+.field-hint {
+  font-size: 0.75rem;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin-top: 0.125rem;
+}
+
+.field-hint i {
+  font-size: 0.6875rem;
+  color: #9ca3af;
+}
+
+/* ── PrimeNG Input overrides ──────────────────────── */
+:host ::ng-deep {
+  .p-inputtext,
+  .p-dropdown,
+  .p-inputnumber,
+  .p-inputtextarea {
+    width: 100%;
+  }
+
+  .p-inputtext {
+    font-size: 0.9375rem;
+    padding: 0.6875rem 0.875rem;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    color: #0f172a;
+    background: #ffffff;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .p-inputtext:enabled:focus {
+    border-color: #0891b2;
+    box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.1);
+    outline: none;
+  }
+
+  .p-inputtext::placeholder { color: #9ca3af; }
+
+  .p-dropdown {
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    background: #ffffff;
+  }
+
+  .p-dropdown:not(.p-disabled):hover { border-color: #0891b2; }
+
+  .p-dropdown:not(.p-disabled).p-focus {
+    border-color: #0891b2;
+    box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.1);
+  }
+
+  .p-dropdown .p-dropdown-label {
+    font-size: 0.9375rem;
+    padding: 0.6875rem 0.875rem;
+    color: #0f172a;
+  }
+
+  .p-dropdown .p-dropdown-label.p-placeholder { color: #9ca3af; }
+
+  .p-inputnumber-input {
+    font-size: 0.9375rem;
+    padding: 0.6875rem 0.875rem;
+  }
+
+  .p-inputtext.p-invalid,
+  .p-dropdown.p-invalid,
+  .p-inputnumber.p-invalid .p-inputtext {
+    border-color: #ef4444;
+  }
+
+  .p-inputtextarea {
+    resize: vertical;
+    line-height: 1.5;
+  }
+}
+
+/* ── Error / Hint text ────────────────────────────── */
+.p-error {
+  font-size: 0.75rem;
+  color: #dc2626;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-weight: 500;
+  margin-top: 0.125rem;
+}
+
+/* ── Form Actions ─────────────────────────────────── */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 2rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid #f1f5f9;
+}
+
+:host ::ng-deep .form-actions .p-button {
+  height: 2.5rem;
+  min-width: 150px;
+  padding: 0 1.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border-radius: 8px;
+}
+
+:host ::ng-deep .form-actions .p-button:not(.p-button-outlined) {
+  background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%);
+  border: none;
+}
+
+:host ::ng-deep .form-actions .p-button:not(.p-button-outlined):hover {
+  background: linear-gradient(135deg, #0e7490 0%, #0891b2 100%);
+}
+
+:host ::ng-deep .form-actions .p-button-outlined {
+  border: 1.5px solid #d1d5db;
+  color: #64748b;
+  background: transparent;
+}
+
+:host ::ng-deep .form-actions .p-button-outlined:hover {
+  border-color: #94a3b8;
+  background: #f8fafc;
+  color: #374151;
+}
+
+/* ── Responsive ───────────────────────────────────── */
+@media (max-width: 768px) {
+  .customer-form-container {
+    padding: 1rem;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  :host ::ng-deep .form-actions .p-button {
+    width: 100%;
+  }
+}

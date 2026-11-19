@@ -1,0 +1,111 @@
+<div class="production-cost-list-container">
+  <app-page-header
+    title="Production Costs"
+    subtitle="Manage manufacturing overhead and production expenses"
+    icon="cog"
+    [showAddButton]="true"
+    addButtonLabel="Add Production Cost"
+    (onAdd)="onAdd()">
+    <div actions class="search-wrapper">
+      <i class="pi pi-search search-icon"></i>
+      <input 
+        type="text" 
+        [formControl]="searchControl"
+        placeholder="Search by product..." 
+        class="modern-search" />
+    </div>
+  </app-page-header>
+
+  <div class="table-wrapper">
+    <div class="modern-table-container">
+      <table class="modern-table">
+        <thead>
+          <tr>
+            <th class="col-sno">S.NO</th>
+            <th class="col-product">PRODUCT</th>
+            <th class="col-cost">LABOUR COST</th>
+            <th class="col-cost">TRANSPORT COST</th>
+            <th class="col-cost">HERBAL COST</th>
+            <th class="col-cost">MACHINE COST</th>
+            <th class="col-cost">OVERHEAD COST</th>
+            <th class="col-total">TOTAL COST</th>
+            <th class="col-actions">ACTIONS</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let productionCost of (filteredProductionCosts$ | async); let i = index" class="table-row">
+            <td class="cell-sno">
+              <span class="sno-text">{{ i + 1 }}</span>
+            </td>
+            
+            <td class="cell-product">
+              <div class="product-text">{{ productionCost.productName }}</div>
+            </td>
+            
+            <td class="cell-cost">
+              <span class="cost-value">₹{{ productionCost.labourCost | number:'1.2-2' }}</span>
+            </td>
+            
+            <td class="cell-cost">
+              <span class="cost-value">₹{{ productionCost.transportCost | number:'1.2-2' }}</span>
+            </td>
+            
+            <td class="cell-cost">
+              <span class="cost-value">₹{{ productionCost.herbalCost | number:'1.2-2' }}</span>
+            </td>
+            
+            <td class="cell-cost">
+              <span class="cost-value">₹{{ productionCost.machineCost | number:'1.2-2' }}</span>
+            </td>
+            
+            <td class="cell-cost">
+              <span class="cost-value">₹{{ productionCost.overheadCost | number:'1.2-2' }}</span>
+            </td>
+            
+            <td class="cell-total">
+              <span class="total-value">₹{{ productionCost.totalCost | number:'1.2-2' }}</span>
+            </td>
+            
+            <td class="cell-actions">
+              <div class="action-group">
+                <button class="btn-action btn-edit" (click)="onEdit(productionCost.id)" 
+                        pTooltip="Edit" tooltipPosition="top">
+                  <i class="pi pi-pencil"></i>
+                </button>
+                <button class="btn-action btn-delete" (click)="onDelete(productionCost)" 
+                        pTooltip="Delete" tooltipPosition="top">
+                  <i class="pi pi-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+
+          <tr *ngIf="(filteredProductionCosts$ | async)?.length === 0 && !(loading$ | async)" class="empty-row">
+            <td colspan="9">
+              <div class="empty-state">
+                <div class="empty-icon">
+                  <i class="pi pi-cog"></i>
+                </div>
+                <h3 class="empty-title">No Production Costs Found</h3>
+                <p class="empty-text">Get started by adding production costs for your products</p>
+                <button class="btn-primary-empty" (click)="onAdd()">
+                  <i class="pi pi-plus"></i>
+                  Add Production Cost
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div *ngIf="(loading$ | async)" class="loading-overlay">
+        <div class="loading-spinner">
+          <i class="pi pi-spin pi-spinner"></i>
+          <span>Loading production costs...</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <app-confirm-dialog></app-confirm-dialog>
+</div>

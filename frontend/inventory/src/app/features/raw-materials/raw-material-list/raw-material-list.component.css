@@ -1,0 +1,419 @@
+/* Container */
+.raw-material-list-container {
+  padding: 1.5rem;
+  background: #fafbfc;
+  min-height: 100vh;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* Search in Header */
+.search-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: 0.875rem;
+  color: #9ca3af;
+  font-size: 0.875rem;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.modern-search {
+  width: 320px;
+  padding: 0.625rem 0.875rem 0.625rem 2.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  transition: all 0.15s ease;
+  background: white;
+  outline: none;
+}
+
+.modern-search:focus {
+  border-color: #0891b2;
+  box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.1);
+}
+
+.modern-search::placeholder {
+  color: #9ca3af;
+}
+
+/* Table Wrapper */
+.table-wrapper {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  margin: 1.5rem 0;
+  overflow: hidden;
+}
+
+/* Modern Table Container */
+.modern-table-container {
+  overflow-x: auto;
+  background: white;
+}
+
+.modern-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+/* Table Head */
+.modern-table thead {
+  background: #f9fafb;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.modern-table thead tr {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.modern-table th {
+  padding: 1rem 1.5rem;
+  text-align: left;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.modern-table th:first-child {
+  padding-left: 2rem;
+}
+
+.modern-table th:last-child {
+  padding-right: 2rem;
+}
+
+/* Column Widths */
+.col-sno {
+  width: 60px;
+}
+
+.col-name {
+  min-width: 200px;
+}
+
+.col-cost {
+  width: 130px;
+}
+
+.col-purchase {
+  width: 140px;
+}
+
+.col-consumption {
+  width: 160px;
+}
+
+.col-conversion {
+  width: 160px;
+}
+
+.col-min-stock {
+  width: 140px;
+}
+
+.col-status {
+  width: 120px;
+}
+
+.col-actions {
+  width: 100px;
+  text-align: center;
+}
+
+/* Table Body */
+.modern-table tbody {
+  background: white;
+}
+
+.table-row {
+  border-bottom: 1px solid #f3f4f6;
+  transition: all 0.15s ease;
+}
+
+.table-row:hover {
+  background: #fafbfc;
+  box-shadow: inset 0 0 0 1px #f3f4f6;
+}
+
+.table-row:last-child {
+  border-bottom: none;
+}
+
+.modern-table td {
+  padding: 1.25rem 1.5rem;
+  vertical-align: middle;
+}
+
+.modern-table td:first-child {
+  padding-left: 2rem;
+}
+
+.modern-table td:last-child {
+  padding-right: 2rem;
+}
+
+/* Serial Number */
+.cell-sno {
+  font-weight: 500;
+  color: #9ca3af;
+  font-size: 0.875rem;
+}
+
+/* Name Cell */
+.cell-name {
+  max-width: 300px;
+}
+
+.name-text {
+  font-weight: 600;
+  font-size: 0.9375rem;
+  color: #111827;
+  line-height: 1.4;
+}
+
+/* Cost Cell */
+.cost-value {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #0891b2;
+}
+
+/* Unit Cells */
+.unit-text {
+  font-size: 0.875rem;
+  color: #374151;
+  font-weight: 500;
+}
+
+/* Conversion Value */
+.conversion-value {
+  font-size: 0.875rem;
+  color: #111827;
+  font-weight: 600;
+}
+
+/* Stock Value */
+.stock-value {
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+/* Status Indicator */
+.status-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.375rem 0.875rem;
+  border-radius: 20px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.status-indicator.active {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status-indicator.inactive {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.status-indicator.active .status-dot {
+  background: #22c55e;
+  box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
+}
+
+.status-indicator.inactive .status-dot {
+  background: #ef4444;
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+}
+
+/* Actions */
+.action-group {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+/* Action Buttons - Enterprise Standard */
+.btn-action {
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #e2e8f0;
+  border-radius: 7px;
+  background: #ffffff;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 0.875rem;
+}
+
+.btn-action:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+.btn-edit {
+  border-color: #e2e8f0;
+  background: #ffffff;
+  color: #64748b;
+}
+
+.btn-edit:hover {
+  background: #eff6ff;
+  border-color: #3b82f6;
+  color: #2563eb;
+}
+
+.btn-delete {
+  border-color: #e2e8f0;
+  background: #ffffff;
+  color: #64748b;
+}
+
+.btn-delete:hover {
+  background: #fef2f2;
+  border-color: #ef4444;
+  color: #dc2626;
+}
+
+/* Empty State */
+.empty-row td {
+  padding: 0 !important;
+  border: none !important;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  text-align: center;
+}
+
+.empty-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.empty-icon i {
+  font-size: 2rem;
+  color: #0891b2;
+}
+
+.empty-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #374151;
+  margin: 0 0 0.5rem 0;
+}
+
+.empty-text {
+  font-size: 0.9375rem;
+  color: #9ca3af;
+  margin: 0 0 1.5rem 0;
+}
+
+.btn-primary-empty {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: #0891b2;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-primary-empty:hover {
+  background: #0e7490;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(8, 145, 178, 0.3);
+}
+
+/* PrimeNG Tooltip Overrides - Force Horizontal Display */
+:host ::ng-deep .p-tooltip {
+  white-space: nowrap !important;
+  word-break: keep-all !important;
+  writing-mode: horizontal-tb !important;
+  text-orientation: mixed !important;
+  direction: ltr !important;
+}
+
+:host ::ng-deep .p-tooltip .p-tooltip-text {
+  white-space: nowrap !important;
+  word-break: keep-all !important;
+  display: inline-block !important;
+  writing-mode: horizontal-tb !important;
+  text-orientation: mixed !important;
+  direction: ltr !important;
+  letter-spacing: normal !important;
+  word-spacing: normal !important;
+}
+
+:host ::ng-deep .p-tooltip .p-tooltip-arrow {
+  display: block !important;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .modern-search {
+    width: 100%;
+  }
+
+  .modern-table {
+    font-size: 0.8125rem;
+  }
+
+  .modern-table th,
+  .modern-table td {
+    padding: 0.875rem 1rem;
+  }
+
+  .modern-table th:first-child,
+  .modern-table td:first-child {
+    padding-left: 1.5rem;
+  }
+
+  .modern-table th:last-child,
+  .modern-table td:last-child {
+    padding-right: 1.5rem;
+  }
+}

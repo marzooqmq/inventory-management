@@ -1,0 +1,86 @@
+<div class="finished-goods-stock-list-container">
+  <app-page-header 
+    title="Finished Goods Stock" 
+    subtitle="View and monitor finished product inventory levels" 
+    icon="shopping-bag">
+    <div actions class="search-wrapper">
+      <i class="pi pi-search search-icon"></i>
+      <input 
+        type="text" 
+        [formControl]="searchControl" 
+        placeholder="Search by product..." 
+        class="modern-search" />
+    </div>
+  </app-page-header>
+
+  <div class="table-wrapper">
+    <div class="modern-table-container">
+      <table class="modern-table">
+        <thead>
+          <tr>
+            <th class="col-sno">S.NO</th>
+            <th class="col-product">PRODUCT NAME</th>
+            <th class="col-quantity">QUANTITY</th>
+            <th class="col-min-level">MIN STOCK LEVEL</th>
+            <th class="col-status">STATUS</th>
+            <th class="col-updated">LAST UPDATED</th>
+            <th class="col-actions">ACTIONS</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let stock of filteredStocks; let i = index" class="table-row">
+            <td class="cell-sno">{{ i + 1 }}</td>
+            <td class="cell-product">
+              <div class="product-text">
+                <i class="pi pi-box"></i>
+                {{ stock.productName }}
+              </div>
+            </td>
+            <td class="cell-quantity">
+              <span class="quantity-value">{{ stock.boxQuantity }}</span>
+              <span class="quantity-label">boxes</span>
+            </td>
+            <td class="cell-min-level">
+              {{ getMinStockLevel(stock) }}
+            </td>
+            <td class="cell-status">
+              <span class="status-badge" [ngClass]="getStockStatusClass(stock)">
+                <i class="pi" [ngClass]="getStockStatusIcon(stock)"></i>
+                {{ getStockStatusLabel(stock) }}
+              </span>
+            </td>
+            <td class="cell-updated">
+              <span class="updated-text">{{ stock.lastUpdated ? (stock.lastUpdated | date:'MMM dd, yyyy') : 'N/A' }}</span>
+            </td>
+            <td class="cell-actions">
+              <div class="action-group">
+                <button 
+                  class="btn-action btn-view" 
+                  (click)="onView(stock.id)" 
+                  pTooltip="View Details" 
+                  tooltipPosition="top">
+                  <i class="pi pi-eye"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="filteredStocks.length === 0 && !loading" class="empty-row">
+            <td colspan="7">
+              <div class="empty-state">
+                <div class="empty-icon"><i class="pi pi-shopping-bag"></i></div>
+                <h3 class="empty-title">No Finished Goods Stock Found</h3>
+                <p class="empty-text">Stock is automatically updated when production is completed</p>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div *ngIf="loading" class="loading-overlay">
+        <div class="loading-spinner">
+          <i class="pi pi-spin pi-spinner"></i>
+          <span>Loading finished goods stock...</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

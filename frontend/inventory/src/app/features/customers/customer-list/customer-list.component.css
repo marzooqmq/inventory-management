@@ -1,0 +1,762 @@
+/* ===== Customer List — Consistent Design System ===== */
+
+.customer-list-container {
+  padding: 1.5rem;
+}
+
+/* ── Search ───────────────────────────────────────────── */
+.search-wrapper {
+  position: relative;
+  flex: 1;
+  min-width: 300px;
+  max-width: 420px;
+}
+
+.search-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-color-secondary);
+  font-size: 0.95rem;
+  pointer-events: none;
+}
+
+.modern-search {
+  width: 100%;
+  padding: 0.75rem 1rem 0.75rem 2.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.9375rem;
+  background: #ffffff;
+  color: #0f172a;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.modern-search:focus {
+  outline: none;
+  border-color: #0891b2;
+  box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.1);
+}
+
+.modern-search::placeholder {
+  color: #9ca3af;
+}
+
+/* ── Table Wrapper ───────────────────────────────────── */
+.table-wrapper {
+  margin-top: 1.5rem;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  border: 1px solid #f1f5f9;
+}
+
+.modern-table-container {
+  overflow-x: auto;
+}
+
+.modern-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.modern-table thead {
+  background: #f8fafc;
+}
+
+.modern-table thead th {
+  padding: 0.875rem 1rem;
+  text-align: left;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  border-bottom: 1px solid #e2e8f0;
+  white-space: nowrap;
+}
+
+.modern-table tbody tr {
+  border-bottom: 1px solid #f1f5f9;
+  transition: background-color 0.15s;
+}
+
+.modern-table tbody tr:hover {
+  background-color: #f8fafc;
+}
+
+.modern-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.modern-table tbody td {
+  padding: 1rem;
+  vertical-align: middle;
+}
+
+/* ── Cell Widths ─────────────────────────────────────── */
+.cell-index  { width: 64px; }
+.cell-customer { min-width: 200px; }
+.cell-contact  { min-width: 240px; }
+.cell-type     { width: 160px; }
+.cell-location { min-width: 180px; }
+.cell-discount { width: 110px; text-align: center; }
+.cell-actions  { width: 100px; }
+
+/* ── S.No ────────────────────────────────────────────── */
+.sno-text {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #94a3b8;
+}
+
+/* ── Customer Info ───────────────────────────────────── */
+.customer-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.customer-name {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #0f172a;
+  line-height: 1.3;
+}
+
+.customer-id {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+/* ── Contact Info ────────────────────────────────────── */
+.contact-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.phone {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.address {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  font-size: 0.8125rem;
+  color: #64748b;
+  line-height: 1.4;
+}
+
+.phone i, .address i {
+  font-size: 0.75rem;
+  color: #0891b2;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+/* ── Location Info ───────────────────────────────────── */
+.location-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  font-size: 0.875rem;
+  color: #334155;
+  font-weight: 500;
+}
+
+.zip-code {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.8125rem;
+  color: #64748b;
+  font-weight: 400;
+}
+
+.zip-code i {
+  font-size: 0.7rem;
+  color: #94a3b8;
+}
+
+/* ── Discount Badge ──────────────────────────────────── */
+.discount-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.3rem 0.7rem;
+  background: #d1fae5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+  border-radius: 6px;
+  font-size: 0.8125rem;
+  font-weight: 700;
+}
+
+.no-discount {
+  color: #cbd5e1;
+  font-size: 1rem;
+  font-weight: 400;
+}
+
+/* ── Action Buttons (matching invoice-list) ──────────── */
+.action-buttons {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+}
+
+.action-btn {
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #e2e8f0;
+  border-radius: 7px;
+  background: #ffffff;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 0.875rem;
+  padding: 0;
+}
+
+.action-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+.action-btn.btn-edit:hover {
+  background: #eff6ff;
+  border-color: #3b82f6;
+  color: #2563eb;
+}
+
+.action-btn.btn-delete:hover {
+  background: #fef2f2;
+  border-color: #ef4444;
+  color: #dc2626;
+}
+
+:host ::ng-deep .action-btn .p-button-icon {
+  font-size: 0.875rem;
+}
+
+/* ── p-tag overrides (customer types) ───────────────── */
+:host ::ng-deep .p-tag {
+  padding: 5px 11px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  border-radius: 6px;
+}
+
+/* DISTRIBUTOR → green */
+:host ::ng-deep .p-tag.p-tag-success {
+  background: #d1fae5;
+  color: #059669;
+}
+
+/* DEALER → blue */
+:host ::ng-deep .p-tag.p-tag-info {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+/* DIRECT_CUSTOMER → orange */
+:host ::ng-deep .p-tag.p-tag-warning {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+:host ::ng-deep .p-tag.p-tag-danger {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+/* ── No Data ─────────────────────────────────────────── */
+.no-data-row {
+  border-bottom: none !important;
+}
+
+.no-data-cell {
+  padding: 3.5rem !important;
+}
+
+.no-data-message {
+  text-align: center;
+  color: #94a3b8;
+}
+
+.no-data-message i {
+  font-size: 3rem;
+  opacity: 0.3;
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.no-data-message p {
+  font-size: 1rem;
+  margin-bottom: 1.25rem;
+  color: #64748b;
+}
+
+/* ── Responsive ──────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .search-wrapper { max-width: 100%; }
+  .cell-location  { min-width: 140px; }
+}
+
+@media (max-width: 768px) {
+  .customer-list-container { padding: 1rem; }
+
+  .modern-table thead th,
+  .modern-table tbody td {
+    padding: 0.75rem;
+    font-size: 0.8125rem;
+  }
+}
+
+/* ===== Edit Customer Dialog ===== */
+
+:host ::ng-deep .p-dialog .p-dialog-header {
+  background: linear-gradient(135deg, #f0fdfa 0%, #ecfeff 100%);
+  border-bottom: 1px solid #e5e7eb;
+  padding: 1.5rem 1.75rem;
+}
+
+:host ::ng-deep .p-dialog .p-dialog-content {
+  padding: 1.75rem;
+  background: #fafbfc;
+}
+
+:host ::ng-deep .p-dialog .p-dialog-footer {
+  padding: 1.25rem 1.75rem;
+  background: white;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+:host ::ng-deep .p-dialog .p-dialog-footer button {
+  min-width: 130px;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.9375rem;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.dialog-header-custom {
+  width: 100%;
+}
+
+.dialog-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #0e7490;
+  margin-bottom: 0.25rem;
+}
+
+.dialog-title i {
+  font-size: 1.3rem;
+  color: #0891b2;
+}
+
+.dialog-subtitle {
+  font-size: 0.875rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.dialog-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  margin-top: 0.5rem;
+}
+
+.dialog-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.dialog-form-field.full-width {
+  grid-column: 1 / -1;
+}
+
+.dialog-form-field label {
+  display: block;
+  font-weight: 600;
+  font-size: 0.8125rem;
+  color: #1f2937;
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.01em;
+}
+
+.dialog-form-field .required {
+  color: #ef4444;
+  margin-left: 2px;
+  font-weight: 700;
+}
+
+.dialog-form-field input,
+.dialog-form-field textarea,
+.dialog-form-field :host ::ng-deep .p-dropdown {
+  width: 100%;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 0.6875rem 0.875rem;
+  font-size: 0.9375rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  background: #ffffff;
+}
+
+.dialog-form-field input:focus,
+.dialog-form-field textarea:focus {
+  border-color: #0891b2;
+  box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.1);
+  outline: none;
+}
+
+.dialog-form-field textarea {
+  resize: vertical;
+  min-height: 64px;
+  font-family: inherit;
+}
+
+:host ::ng-deep .dialog-form-field .p-dropdown {
+  width: 100%;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+}
+
+:host ::ng-deep .dialog-form-field .p-dropdown:not(.p-disabled):hover {
+  border-color: #cbd5e1;
+}
+
+:host ::ng-deep .dialog-form-field .p-dropdown:not(.p-disabled).p-focus {
+  border-color: #0891b2;
+  box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.1);
+}
+
+:host ::ng-deep .dialog-form-field .p-dropdown .p-dropdown-label {
+  padding: 0.6875rem 0.875rem;
+  font-size: 0.9375rem;
+}
+
+:host ::ng-deep .dialog-form-field .p-inputnumber {
+  width: 100%;
+}
+
+:host ::ng-deep .dialog-form-field .p-inputnumber-input {
+  width: 100%;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 0.6875rem 0.875rem;
+  font-size: 0.9375rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+:host ::ng-deep .dialog-form-field .p-inputnumber-input:focus {
+  border-color: #0891b2;
+  box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.1);
+}
+
+:host ::ng-deep .p-dialog .p-dialog-footer .customer-cancel-btn {
+  border: 2px solid #e5e7eb;
+  color: #6b7280;
+  background: transparent;
+}
+
+:host ::ng-deep .p-dialog .p-dialog-footer .customer-cancel-btn:hover {
+  background: #f9fafb;
+  border-color: #d1d5db;
+  color: #374151;
+}
+
+:host ::ng-deep .p-dialog .p-dialog-footer .customer-save-btn {
+  background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%);
+  border: none;
+  color: white;
+  box-shadow: 0 2px 4px rgba(8, 145, 178, 0.2);
+}
+
+:host ::ng-deep .p-dialog .p-dialog-footer .customer-save-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #0e7490 0%, #0891b2 100%);
+  box-shadow: 0 4px 8px rgba(8, 145, 178, 0.3);
+  transform: translateY(-1px);
+}
+
+:host ::ng-deep .p-dialog .p-dialog-footer .customer-save-btn:disabled {
+  background: #cbd5e1;
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+
+.search-wrapper {
+  position: relative;
+  width: 350px;
+}
+
+.search-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-color-secondary);
+  font-size: 0.95rem;
+}
+
+.modern-search {
+  width: 100%;
+  padding: 0.75rem 1rem 0.75rem 2.75rem;
+  border: 1px solid var(--surface-border);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  background: var(--surface-ground);
+}
+
+.modern-search:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px var(--primary-color-light);
+}
+
+/* Table Styles */
+.table-wrapper {
+  margin-top: 1.5rem;
+  background: var(--surface-card);
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.modern-table-container {
+  overflow-x: auto;
+}
+
+.modern-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.modern-table thead {
+  background: var(--surface-100);
+}
+
+.modern-table thead th {
+  padding: 1rem;
+  text-align: left;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-color-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid var(--surface-border);
+}
+
+.modern-table tbody tr {
+  border-bottom: 1px solid var(--surface-border);
+  transition: background-color 0.2s;
+}
+
+.modern-table tbody tr:hover {
+  background-color: var(--surface-hover);
+}
+
+.modern-table tbody td {
+  padding: 1rem;
+  vertical-align: middle;
+}
+
+/* Cell Specific Styles */
+.cell-index {
+  width: 70px;
+}
+
+.sno-text {
+  font-weight: 600;
+  color: var(--text-color-secondary);
+}
+
+.cell-customer {
+  min-width: 200px;
+}
+
+.customer-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.customer-name {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text-color);
+}
+
+.customer-id {
+  font-size: 0.8rem;
+  color: var(--text-color-secondary);
+}
+
+.cell-contact {
+  min-width: 220px;
+}
+
+.contact-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.phone, .address {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.phone {
+  color: var(--text-color);
+  font-weight: 500;
+}
+
+.address {
+  color: var(--text-color-secondary);
+  font-size: 0.85rem;
+}
+
+.phone i, .address i {
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
+
+.cell-type {
+  width: 150px;
+}
+
+.cell-location {
+  min-width: 180px;
+}
+
+.location-info {
+  font-size: 0.9rem;
+  color: var(--text-color);
+}
+
+.zip-code {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.25rem;
+  font-size: 0.85rem;
+  color: var(--text-color-secondary);
+}
+
+.cell-discount {
+  width: 100px;
+  text-align: center;
+}
+
+.discount-badge {
+  display: inline-block;
+  padding: 0.35rem 0.75rem;
+  background: var(--green-50);
+  color: var(--green-700);
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.no-discount {
+  color: var(--text-color-secondary);
+  font-size: 0.9rem;
+}
+
+.cell-actions {
+  width: 120px;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.action-btn {
+  width: 2.2rem;
+  height: 2.2rem;
+}
+
+.action-btn:hover {
+  transform: scale(1.1);
+}
+
+/* No Data State */
+.no-data-row {
+  border-bottom: none !important;
+}
+
+.no-data-cell {
+  padding: 3rem !important;
+}
+
+.no-data-message {
+  text-align: center;
+  color: var(--text-color-secondary);
+}
+
+.no-data-message i {
+  font-size: 3rem;
+  opacity: 0.3;
+  margin-bottom: 1rem;
+}
+
+.no-data-message p {
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .search-wrapper {
+    width: 300px;
+  }
+  
+  .cell-location, .cell-contact {
+    min-width: 150px;
+  }
+}
+
+@media (max-width: 768px) {
+  .customer-list-container {
+    padding: 1rem;
+  }
+  
+  .modern-table thead th,
+  .modern-table tbody td {
+    padding: 0.75rem;
+    font-size: 0.85rem;
+  }
+}

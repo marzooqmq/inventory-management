@@ -1,0 +1,86 @@
+<div class="box-list-container">
+  <app-page-header
+    title="Boxes"
+    subtitle="Manage product packaging costs"
+    icon="box"
+    [showAddButton]="true"
+    addButtonLabel="Add Box"
+    (onAdd)="onAddBox()">
+    <div actions class="search-wrapper">
+      <i class="pi pi-search search-icon"></i>
+      <input 
+        type="text" 
+        [formControl]="searchControl"
+        placeholder="Search by product..." 
+        class="modern-search" />
+    </div>
+  </app-page-header>
+
+  <div class="table-wrapper">
+    <div class="modern-table-container">
+      <table class="modern-table">
+        <thead>
+          <tr>
+            <th class="col-sno">S.NO</th>
+            <th class="col-product">PRODUCT</th>
+            <th class="col-cost">COST PER PAD</th>
+            <th class="col-status">STATUS</th>
+            <th class="col-actions">ACTIONS</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let box of (filteredBoxes$ | async); let i = index" class="table-row">
+            <td class="cell-sno">
+              <span class="sno-text">{{ i + 1 }}</span>
+            </td>
+            
+            <td class="cell-product">
+              <div class="product-text">{{ box.productName }}</div>
+            </td>
+            
+            <td class="cell-cost">
+              <span class="cost-value">₹{{ box.boxCostPerPad | number:'1.2-2' }}</span>
+            </td>
+            
+            <td class="cell-status">
+              <span class="status-badge" [class.status-active]="box.active" [class.status-inactive]="!box.active">
+                {{ box.active ? 'Active' : 'Inactive' }}
+              </span>
+            </td>
+            
+            <td class="cell-actions">
+              <div class="action-group">
+                <button class="btn-action btn-edit" (click)="onEdit(box.id)" 
+                        pTooltip="Edit" tooltipPosition="top">
+                  <i class="pi pi-pencil"></i>
+                </button>
+                <button class="btn-action btn-delete" (click)="onDelete(box)" 
+                        pTooltip="Delete" tooltipPosition="top">
+                  <i class="pi pi-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+
+          <tr *ngIf="(filteredBoxes$ | async)?.length === 0 && !(loading$ | async)" class="empty-row">
+            <td colspan="5">
+              <div class="empty-state">
+                <div class="empty-icon">
+                  <i class="pi pi-box"></i>
+                </div>
+                <h3 class="empty-title">No Boxes Found</h3>
+                <p class="empty-text">Get started by creating your first box configuration</p>
+                <button class="btn-primary-empty" (click)="onAddBox()">
+                  <i class="pi pi-plus"></i>
+                  Add Box
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<app-confirm-dialog></app-confirm-dialog>

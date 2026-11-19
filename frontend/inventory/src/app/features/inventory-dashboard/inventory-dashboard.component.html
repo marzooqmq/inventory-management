@@ -1,0 +1,495 @@
+<div class="inventory-dashboard">
+  <!-- Page Header -->
+  <div class="dashboard-header">
+    <div class="header-content">
+      <div class="header-left">
+        <h1 class="page-title">
+          <i class="pi pi-shopping-bag"></i>
+          Inventory Dashboard
+        </h1>
+        <p class="page-subtitle">Real-time inventory and production analytics</p>
+      </div>
+      <div class="header-right">
+        <button 
+          pButton 
+          pRipple
+          icon="pi pi-refresh" 
+          label="Refresh" 
+          class="p-button-primary refresh-btn"
+          (click)="refreshDashboard()"
+          [loading]="loadingSummary">
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPI Summary Cards -->
+  <div class="kpi-grid">
+    <p-card styleClass="kpi-card kpi-primary">
+      <div class="kpi-content">
+        <div class="kpi-icon primary">
+          <i class="pi pi-box"></i>
+        </div>
+        <div class="kpi-details">
+          <span class="kpi-label">Total Products</span>
+          <h3 class="kpi-value" *ngIf="summary">{{ formatNumber(summary.totalProducts) }}</h3>
+          <p-skeleton *ngIf="!summary" width="80px" height="2rem"></p-skeleton>
+          <span class="kpi-meta" *ngIf="summary">{{ summary.activeProducts }} active</span>
+        </div>
+      </div>
+    </p-card>
+
+    <p-card styleClass="kpi-card kpi-success">
+      <div class="kpi-content">
+        <div class="kpi-icon success">
+          <i class="pi pi-wallet"></i>
+        </div>
+        <div class="kpi-details">
+          <span class="kpi-label">Total Stock Value</span>
+          <h3 class="kpi-value" *ngIf="summary">{{ formatCurrency(summary.totalStockValue) }}</h3>
+          <p-skeleton *ngIf="!summary" width="120px" height="2rem"></p-skeleton>
+        </div>
+      </div>
+    </p-card>
+
+    <p-card styleClass="kpi-card kpi-warning clickable-card" 
+            (click)="scrollToLowStockSection()"
+            [pTooltip]="summary && summary.lowStockItemsCount > 0 ? 'Click to view details' : 'All stock levels healthy'"
+            tooltipPosition="top">
+      <div class="kpi-content">
+        <div class="kpi-icon warning">
+          <i class="pi pi-exclamation-triangle"></i>
+        </div>
+        <div class="kpi-details">
+          <span class="kpi-label">Low Stock Alerts</span>
+          <h3 class="kpi-value" *ngIf="summary">{{ summary.lowStockItemsCount }}</h3>
+          <p-skeleton *ngIf="!summary" width="60px" height="2rem"></p-skeleton>
+          <span class="kpi-meta critical" *ngIf="summary && summary.lowStockItemsCount > 0">
+            Click to view <i class="pi pi-arrow-down"></i>
+          </span>
+          <span class="kpi-meta" *ngIf="summary && summary.lowStockItemsCount === 0">
+            All healthy
+          </span>
+        </div>
+      </div>
+    </p-card>
+
+    <p-card styleClass="kpi-card kpi-info">
+      <div class="kpi-content">
+        <div class="kpi-icon info">
+          <i class="pi pi-cog"></i>
+        </div>
+        <div class="kpi-details">
+          <span class="kpi-label">Active Production</span>
+          <h3 class="kpi-value" *ngIf="summary">{{ summary.activeProductionOrders }}</h3>
+          <p-skeleton *ngIf="!summary" width="60px" height="2rem"></p-skeleton>
+          <span class="kpi-meta" *ngIf="summary">orders in progress</span>
+        </div>
+      </div>
+    </p-card>
+  </div>
+
+  <!-- Main Content Grid -->
+  <div class="dashboard-content">
+    <!-- SECTION 1: CRITICAL ALERTS - Reorder Point Calculator -->
+    <div class="table-section full-width">
+      <p-card>
+        <ng-template pTemplate="header">
+          <div class="card-header">
+            <h3 class="card-title">
+              <i class="pi pi-shopping-cart"></i>
+              Reorder Point Recommendations
+            </h3>
+            <p-tag 
+              *ngIf="getUrgentReorderCount() > 0" 
+              [value]="getUrgentReorderCount().toString()" 
+              severity="warning"
+              icon="pi pi-exclamation-triangle">
+            </p-tag>
+          </div>
+        </ng-template>
+        <p-table 
+          [value]="reorderPoints" 
+          [tableStyle]="{'min-width': '100%'}"
+          [loading]="loadingReorderPoints"
+          styleClass="p-datatable-hoverable-rows">
+          <ng-template pTemplate="header">
+            <tr>
+              <th pTooltip="Item name">Item</th>
+              <th pTooltip="Material or Box">Type</th>
+              <th pTooltip="Average consumption per day">Daily Usage</th>
+              <th pTooltip="When stock will run out">Stockout Date</th>
+              <th pTooltip="Recommended order quantity">Order Quantity</th>
+              <th pTooltip="Action required">Action</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-reorder>
+            <tr [class.reorder-now]="reorder.shouldReorderNow">
+              <td><strong>{{ reorder.itemName }}</strong></td>
+              <td>
+                <span class="status-badge" 
+                      [class.status-raw-material]="reorder.itemType === 'RAW_MATERIAL'" 
+                      [class.status-box]="reorder.itemType === 'BOX'">
+                  {{ getTypeLabel(reorder.itemType) }}
+                </span>
+              </td>
+              <td>{{ formatNumber(reorder.dailyConsumption) }} {{ reorder.unit }}/day</td>
+              <td class="stockout-date">
+                {{ formatStockoutDate(reorder.stockoutDate) }}
+              </td>
+              <td>
+                <strong class="suggested-order">
+                  {{ formatNumber(reorder.suggestedOrderQty) }} {{ reorder.unit }}
+                </strong>
+              </td>
+              <td>
+                <span class="status-badge" 
+                      [class.status-critical]="reorder.shouldReorderNow" 
+                      [class.status-low]="!reorder.shouldReorderNow">
+                  {{ reorder.shouldReorderNow ? 'ORDER NOW' : 'OK' }}
+                </span>
+              </td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="6" class="text-center">
+                <div class="empty-state">
+                  <i class="pi pi-info-circle"></i>
+                  <p>No reorder recommendations available</p>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </p-card>
+    </div>
+
+    <!-- SECTION 2: CRITICAL ALERTS - Low Stock Items -->
+    <div class="table-section full-width" id="low-stock-section">
+      <p-card>
+        <ng-template pTemplate="header">
+          <div class="card-header">
+            <h3 class="card-title">
+              <i class="pi pi-exclamation-triangle"></i>
+              Low Stock Alerts
+            </h3>
+            <p-tag 
+              *ngIf="lowStockItems.length > 0" 
+              [value]="lowStockItems.length.toString()" 
+              severity="danger"
+              icon="pi pi-bell">
+            </p-tag>
+          </div>
+        </ng-template>
+        <p-table 
+          [value]="lowStockItems" 
+          [tableStyle]="{'min-width': '100%'}"
+          [loading]="loadingLowStock"
+          styleClass="p-datatable-hoverable-rows">
+          <ng-template pTemplate="header">
+            <tr>
+              <th pTooltip="Item name">Item</th>
+              <th pTooltip="Material or Box">Type</th>
+              <th pTooltip="Current quantity in stock">Current</th>
+              <th pTooltip="Shortfall from minimum level">Deficit</th>
+              <th pTooltip="Severity level">Status</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-item>
+            <tr>
+              <td><strong>{{ item.itemName }}</strong></td>
+              <td>
+                <span class="status-badge" 
+                      [class.status-raw-material]="item.itemType === 'RAW_MATERIAL'" 
+                      [class.status-box]="item.itemType === 'BOX'">
+                  {{ getTypeLabel(item.itemType) }}
+                </span>
+              </td>
+              <td>{{ formatNumber(item.currentQuantity) }}</td>
+              <td class="deficit">{{ formatNumber(item.stockDeficit) }}</td>
+              <td>
+                <span class="status-badge" 
+                      [class.status-critical]="item.severity === 'CRITICAL'" 
+                      [class.status-warning]="item.severity === 'WARNING'" 
+                      [class.status-low]="item.severity === 'LOW'">
+                  {{ item.severity }}
+                </span>
+              </td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="5" class="text-center">
+                <div class="empty-state">
+                  <i class="pi pi-check-circle"></i>
+                  <p>All stock levels are healthy!</p>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </p-card>
+    </div>
+
+    <!-- SECTION 3: MATERIAL PLANNING - Material Consumption + Days of Supply (Side by Side) -->
+    <div class="chart-section">
+      <p-card>
+        <ng-template pTemplate="header">
+          <div class="card-header">
+            <h3 class="card-title">
+              <i class="pi pi-chart-bar"></i>
+              Material Consumption Rate
+            </h3>
+          </div>
+        </ng-template>
+        <div class="section-description">
+          <p><strong>Purpose:</strong> Daily usage rate for each material based on last 30 days production. Higher bars = faster consumption.</p>
+        </div>
+        <div class="chart-container">
+          <p-chart 
+            *ngIf="materialConsumptionChart" 
+            #materialChartEl
+            type="bar" 
+            [data]="materialConsumptionChart" 
+            [options]="materialConsumptionChartOptions"
+            height="300px">
+          </p-chart>
+          <p-skeleton *ngIf="!materialConsumptionChart" width="100%" height="300px"></p-skeleton>
+        </div>
+      </p-card>
+    </div>
+
+    <div class="chart-section">
+      <p-card>
+        <ng-template pTemplate="header">
+          <div class="card-header">
+            <h3 class="card-title">
+              <i class="pi pi-clock"></i>
+              Days of Supply
+            </h3>
+          </div>
+        </ng-template>
+        <div class="chart-container">
+          <p-chart 
+            *ngIf="daysOfSupplyChart" 
+            type="bar" 
+            [data]="daysOfSupplyChart" 
+            [options]="daysOfSupplyChartOptions"
+            height="300px">
+          </p-chart>
+          <p-skeleton *ngIf="!daysOfSupplyChart" width="100%" height="300px"></p-skeleton>
+        </div>
+      </p-card>
+    </div>
+
+    <!-- SECTION 4: STOCK OVERVIEW - Stock Distribution + Production Pipeline (Side by Side) -->
+    <div class="chart-section">
+      <p-card>
+        <ng-template pTemplate="header">
+          <div class="card-header">
+            <h3 class="card-title">
+              <i class="pi pi-chart-pie"></i>
+              Stock Distribution
+            </h3>
+          </div>
+        </ng-template>
+        <div class="chart-container">
+          <p-chart 
+            *ngIf="stockBreakdownChart" 
+            type="pie" 
+            [data]="stockBreakdownChart" 
+            [options]="stockDistributionChartOptions"
+            height="280px">
+          </p-chart>
+          <p-skeleton *ngIf="!stockBreakdownChart" width="100%" height="280px"></p-skeleton>
+          
+          <!-- Stock breakdown details -->
+          <div class="stock-details" *ngIf="stockBreakdown">
+            <div class="detail-row">
+              <span class="detail-label">
+                <i class="pi pi-circle-fill" style="color: #14b8a6; font-size: 0.75rem;"></i>
+                Raw Materials:
+              </span>
+              <span class="detail-value">
+                {{ formatCurrency(stockBreakdown.rawMaterialStockValue) }}
+                <small>({{ stockBreakdown.rawMaterialStockCount }} items)</small>
+              </span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">
+                <i class="pi pi-circle-fill" style="color: #3b82f6; font-size: 0.75rem;"></i>
+                Finished Goods:
+              </span>
+              <span class="detail-value">
+                {{ formatCurrency(stockBreakdown.finishedGoodsStockValue) }}
+                <small>({{ stockBreakdown.finishedGoodsStockCount }} products)</small>
+              </span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">
+                <i class="pi pi-circle-fill" style="color: #f59e0b; font-size: 0.75rem;"></i>
+                Boxes:
+              </span>
+              <span class="detail-value">
+                {{ formatCurrency(stockBreakdown.boxStockValue) }}
+                <small>({{ stockBreakdown.boxStockCount }} types)</small>
+              </span>
+            </div>
+          </div>
+        </div>
+      </p-card>
+    </div>
+
+    <div class="chart-section">
+      <p-card>
+        <ng-template pTemplate="header">
+          <div class="card-header">
+            <h3 class="card-title">
+              <i class="pi pi-sitemap"></i>
+              Production Pipeline
+            </h3>
+          </div>
+        </ng-template>
+        <div class="section-description">
+          <p><strong>Purpose:</strong> Production stages overview - how products flow from planning to completion.</p>
+        </div>
+        <div class="chart-container">
+          <p-chart 
+            *ngIf="productionStagesChart" 
+            #stagesChartEl
+            type="bar" 
+            [data]="productionStagesChart" 
+            [options]="productionPipelineChartOptions"
+            height="280px">
+          </p-chart>
+          <p-skeleton *ngIf="!productionStagesChart" width="100%" height="280px"></p-skeleton>
+        </div>
+      </p-card>
+    </div>
+
+    <!-- SECTION 5: PRODUCTION METRICS - Production Trend (Full Width) -->
+    <div class="chart-section full-width">
+      <p-card>
+        <ng-template pTemplate="header">
+          <div class="card-header">
+            <h3 class="card-title">
+              <i class="pi pi-chart-line"></i>
+              Production Trend (Last 7 Days)
+            </h3>
+          </div>
+        </ng-template>
+        <div class="section-description">
+          <p><strong>Purpose:</strong> Historical production output over time. Tracks production consistency and identifies trends.</p>
+        </div>
+        <div class="chart-container">
+          <p-chart 
+            *ngIf="productionTrendChart" 
+            type="line" 
+            [data]="productionTrendChart" 
+            [options]="productionTrendChartOptions"
+            height="300px">
+          </p-chart>
+          <p-skeleton *ngIf="!productionTrendChart" width="100%" height="300px"></p-skeleton>
+        </div>
+      </p-card>
+    </div>
+
+    <!-- SECTION 6: PRODUCTION DETAIL - Today's Production + Top Products (Side by Side) -->
+    <div class="table-section">
+      <p-card>
+        <ng-template pTemplate="header">
+          <div class="card-header">
+            <h3 class="card-title">
+              <i class="pi pi-calendar"></i>
+              {{ getProductionDateTitle() }}
+            </h3>
+            <div class="header-actions">
+              <p-calendar 
+                [(ngModel)]="selectedProductionDate" 
+                [showIcon]="true"
+                dateFormat="dd M yy"
+                [maxDate]="maxDate"
+                (onSelect)="onProductionDateChange()"
+                appendTo="body"
+                styleClass="production-calendar">
+              </p-calendar>
+            </div>
+          </div>
+        </ng-template>
+        <div class="section-description">
+          <p><strong>Purpose:</strong> Detailed production breakdown for selected date. Shows what was manufactured and in what quantity.</p>
+        </div>
+        <p-table 
+          [value]="productionDaily" 
+          [tableStyle]="{'min-width': '100%'}"
+          [loading]="loadingProductionDaily">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>Product</th>
+              <th>Category</th>
+              <th>Quantity</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-production>
+            <tr>
+              <td><strong>{{ production.productName }}</strong></td>
+              <td>
+                <span class="category-badge" [class.category-premium]="production.productCategory === 'PREMIUM'" [class.category-ultra-thin]="production.productCategory === 'ULTRA_THIN'" [class.category-liner]="production.productCategory === 'LINER'" [class.category-others]="production.productCategory === 'OTHERS'">
+                  {{ getCategoryLabel(production.productCategory) }}
+                </span>
+              </td>
+              <td class="quantity">{{ formatNumber(production.quantityProduced) }}</td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="3" class="text-center">
+                <div class="empty-state">
+                  <i class="pi pi-inbox"></i>
+                  <p>No production recorded for this date</p>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </p-card>
+    </div>
+
+    <div class="chart-section">
+      <p-card>
+        <ng-template pTemplate="header">
+          <div class="card-header">
+            <h3 class="card-title">
+              <i class="pi pi-star"></i>
+              {{ chartTitle }}
+            </h3>
+            <p-selectButton 
+              [options]="chartViewOptions" 
+              [(ngModel)]="selectedChartView"
+              (onChange)="onChartViewChange()"
+              styleClass="chart-toggle">
+              <ng-template let-option>
+                <i [class]="option.icon"></i> {{ option.label }}
+              </ng-template>
+            </p-selectButton>
+          </div>
+        </ng-template>
+        <div class="section-description">
+          <p><strong>Purpose:</strong> Best performing products by production volume. Helps identify focus areas.</p>
+        </div>
+        <div class="chart-container">
+          <p-chart 
+            *ngIf="topProductsChart" 
+            #topProductsChartEl
+            type="bar" 
+            [data]="topProductsChart" 
+            [options]="topProductsChartOptions"
+            height="300px">
+          </p-chart>
+          <p-skeleton *ngIf="!topProductsChart" width="100%" height="300px"></p-skeleton>
+        </div>
+      </p-card>
+    </div>
+  </div>
+</div>

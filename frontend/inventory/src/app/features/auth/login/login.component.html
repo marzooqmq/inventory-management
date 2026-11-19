@@ -1,0 +1,96 @@
+<div class="login-container">
+  <div class="login-box">
+    <!-- Logo -->
+    <div class="logo-container">
+      <img src="assets/images/Way2care_logo.png" alt="Way2Care Logo" class="logo" />
+    </div>
+
+    <div class="login-header">
+      <h1>Inventory Management System</h1>
+      <p>Sign in to your account</p>
+    </div>
+
+    <p-card>
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        <!-- Username Field -->
+        <div class="form-group">
+          <label for="username" class="form-label">
+            Username <span class="required">*</span>
+          </label>
+          <span class="p-input-icon-left w-100">
+            <i class="pi pi-user"></i>
+            <input
+              pInputText
+              id="username"
+              formControlName="username"
+              placeholder="Enter your username"
+              class="w-100"
+              [class.ng-invalid]="username?.invalid && username?.touched"
+            />
+          </span>
+          <small
+            *ngIf="username?.invalid && username?.touched"
+            class="p-error"
+          >
+            <span *ngIf="username?.errors?.['required']">Username is required</span>
+            <span *ngIf="username?.errors?.['minlength']">Username must be at least 3 characters</span>
+          </small>
+        </div>
+
+        <!-- Password Field -->
+        <div class="form-group">
+          <label for="password" class="form-label">
+            Password <span class="required">*</span>
+          </label>
+          <p-password
+            id="password"
+            formControlName="password"
+            placeholder="Enter your password"
+            [toggleMask]="true"
+            [feedback]="false"
+            styleClass="w-100 password-field"
+            inputStyleClass="w-100"
+            [class.ng-invalid]="password?.invalid && password?.touched"
+          >
+            <ng-template pTemplate="header">
+              <i class="pi pi-lock"></i>
+            </ng-template>
+          </p-password>
+          <small
+            *ngIf="password?.invalid && password?.touched"
+            class="p-error"
+          >
+            <span *ngIf="password?.errors?.['required']">Password is required</span>
+            <span *ngIf="password?.errors?.['minlength']">Password must be at least 6 characters</span>
+          </small>
+        </div>
+
+        <!-- Remember Me -->
+        <div class="form-group remember-me">
+          <p-checkbox
+            formControlName="rememberMe"
+            [binary]="true"
+            inputId="rememberMe"
+            label="Remember me"
+          ></p-checkbox>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="form-group">
+          <p-button
+            type="submit"
+            label="Sign In"
+            icon="pi pi-sign-in"
+            [loading]="loading"
+            styleClass="w-100 submit-btn"
+            [disabled]="loading"
+          ></p-button>
+        </div>
+      </form>
+    </p-card>
+
+    <div class="login-footer">
+      <p>&copy; 2026 Way2Care - Natural Pure Herbs. All rights reserved.</p>
+    </div>
+  </div>
+</div>

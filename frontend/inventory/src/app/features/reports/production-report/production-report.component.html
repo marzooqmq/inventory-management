@@ -1,0 +1,304 @@
+﻿<div class="report-container">
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="page-header-left">
+      <h1 class="page-title">Production Reports</h1>
+      <p class="page-sub">Track production execution, stage progress, and output</p>
+    </div>
+  </div>
+
+  <!-- Filter Card -->
+  <div class="filter-card">
+    <div class="filter-grid">
+      <div class="filter-item">
+        <label class="filter-label">Start Date</label>
+        <p-calendar [(ngModel)]="startDate" dateFormat="yy-mm-dd" [showIcon]="true" placeholder="YYYY-MM-DD" styleClass="rpt-calendar" appendTo="body" />
+      </div>
+      <div class="filter-item">
+        <label class="filter-label">End Date</label>
+        <p-calendar [(ngModel)]="endDate" dateFormat="yy-mm-dd" [showIcon]="true" placeholder="YYYY-MM-DD" styleClass="rpt-calendar" appendTo="body" />
+      </div>
+      <div class="filter-item" *ngIf="activeTab === 'execution'">
+        <label class="filter-label">Month</label>
+        <p-dropdown [options]="monthOptions" [(ngModel)]="selectedMonth" optionLabel="label" optionValue="value" styleClass="rpt-dropdown" appendTo="body" [filter]="false" placeholder="All Months" />
+      </div>
+      <div class="filter-item" *ngIf="activeTab === 'execution'">
+        <label class="filter-label">Year</label>
+        <p-dropdown [options]="yearOptions" [(ngModel)]="selectedYear" optionLabel="label" optionValue="value" styleClass="rpt-dropdown" appendTo="body" [filter]="false" placeholder="All Years" />
+      </div>
+      <div class="filter-item" *ngIf="activeTab === 'output'">
+        <label class="filter-label">Product</label>
+        <p-dropdown [options]="productOptions" [(ngModel)]="selectedProductId" optionLabel="label" optionValue="value" styleClass="rpt-dropdown" appendTo="body" [filter]="true" filterPlaceholder="Search product" placeholder="All Products" />
+      </div>
+      <div class="filter-actions">
+        <button class="btn-primary" (click)="onApplyFilters()">
+          <i class="pi pi-search"></i> Apply
+        </button>
+        <button class="btn-ghost" (click)="onClearFilters()">
+          <i class="pi pi-times"></i> Clear
+        </button>
+      </div>
+    </div>
+    <p class="output-hint" *ngIf="activeTab === 'output' && (!startDate || !endDate)">
+      <i class="pi pi-info-circle"></i> Start Date and End Date are required for the Output report.
+    </p>
+  </div>
+
+  <!-- Tab Bar -->
+  <div class="tab-bar">
+    <button class="tab-btn" [class.tab-active]="activeTab === 'execution'" (click)="setTab('execution')">
+      <i class="pi pi-list"></i> Execution
+      <span class="tab-count" *ngIf="execResponse">{{ execResponse.totalRecords }}</span>
+    </button>
+    <button class="tab-btn" [class.tab-active]="activeTab === 'stage'" (click)="setTab('stage')">
+      <i class="pi pi-sitemap"></i> Stage Progress
+      <span class="tab-count" *ngIf="stageResponse">{{ stageResponse.totalRecords }}</span>
+    </button>
+    <button class="tab-btn" [class.tab-active]="activeTab === 'output'" (click)="setTab('output')">
+      <i class="pi pi-box"></i> Output
+      <span class="tab-count" *ngIf="outputResponse">{{ outputResponse.totalRecords }}</span>
+    </button>
+  </div>
+
+  <!-- ══════════════════ EXECUTION TAB ══════════════════ -->
+  <ng-container *ngIf="activeTab === 'execution'">
+    <!-- KPIs -->
+    <div class="kpi-row" *ngIf="execResponse && !execLoading">
+      <div class="kpi-card kpi-blue">
+        <div class="kpi-icon"><i class="pi pi-clipboard"></i></div>
+        <div class="kpi-body">
+          <div class="kpi-label">Total Orders</div>
+          <div class="kpi-value">{{ execResponse.totalOrders }}</div>
+        </div>
+      </div>
+      <div class="kpi-card kpi-cyan kpi-highlight">
+        <div class="kpi-icon"><i class="pi pi-box"></i></div>
+        <div class="kpi-body">
+          <div class="kpi-label">Total Produced</div>
+          <div class="kpi-value">{{ execResponse.totalProducedQty | number }} boxes</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-card">
+      <div class="table-info-bar">
+        <span class="record-count" *ngIf="execResponse">
+          {{ execResponse.totalRecords }} record(s) &nbsp;·&nbsp; Page {{ execPage + 1 }} of {{ execResponse.totalPages }}
+        </span>
+        <span class="record-count" *ngIf="!execResponse && !execLoading">No data</span>
+      </div>
+      <div class="table-scroll-wrapper">
+        <table class="rpt-table">
+          <thead>
+            <tr>
+              <th class="th-sno">S.NO</th>
+              <th>ORDER ID</th>
+              <th>PRODUCT</th>
+              <th class="th-right">ORDER QTY</th>
+              <th class="th-right">PRODUCED QTY</th>
+              <th class="th-center">STATUS</th>
+              <th class="th-center">START DATE</th>
+              <th class="th-center">END DATE</th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container *ngIf="execLoading">
+              <tr class="skeleton-row" *ngFor="let s of [1,2,3,4,5]">
+                <td *ngFor="let c of [1,2,3,4,5,6,7,8]"><p-skeleton height="1rem" /></td>
+              </tr>
+            </ng-container>
+            <ng-container *ngIf="!execLoading">
+              <tr *ngFor="let row of execRecords; let i = index">
+                <td class="td-sno td-center">{{ execPage * execPageSize + i + 1 }}</td>
+                <td class="td-mono td-blue">#{{ row.productionOrderId }}</td>
+                <td class="td-primary-text">{{ row.productName }}</td>
+                <td class="td-right td-num">{{ row.orderQty | number }}</td>
+                <td class="td-right td-num td-bold">{{ row.producedQty | number }}</td>
+                <td class="td-center">
+                  <span class="status-badge" [ngClass]="statusClass(row.orderStatus)">{{ row.orderStatus }}</span>
+                </td>
+                <td class="td-center td-date">{{ formatDate(row.startDate) }}</td>
+                <td class="td-center td-date">{{ formatDate(row.endDate) }}</td>
+              </tr>
+              <tr *ngIf="execRecords.length === 0">
+                <td colspan="8">
+                  <div class="empty-state">
+                    <div class="empty-icon"><i class="pi pi-inbox"></i></div>
+                    <div class="empty-title">No execution records found</div>
+                    <div class="empty-sub">Adjust filters and try again</div>
+                  </div>
+                </td>
+              </tr>
+            </ng-container>
+          </tbody>
+        </table>
+      </div>
+      <!-- Pagination -->
+      <div class="pagination-bar" *ngIf="execPages.length > 1">
+        <button class="page-btn" [disabled]="execPage === 0" (click)="execGoToPage(0)"><i class="pi pi-angle-double-left"></i></button>
+        <button class="page-btn" [disabled]="execPage === 0" (click)="execGoToPage(execPage - 1)"><i class="pi pi-angle-left"></i></button>
+        <button *ngFor="let p of execPages" class="page-btn" [class.page-active]="p === execPage" (click)="execGoToPage(p)">{{ p + 1 }}</button>
+        <button class="page-btn" [disabled]="execPage === (execPages.length - 1)" (click)="execGoToPage(execPage + 1)"><i class="pi pi-angle-right"></i></button>
+        <button class="page-btn" [disabled]="execPage === (execPages.length - 1)" (click)="execGoToPage(execPages.length - 1)"><i class="pi pi-angle-double-right"></i></button>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- ══════════════════ STAGE PROGRESS TAB ══════════════════ -->
+  <ng-container *ngIf="activeTab === 'stage'">
+    <div class="table-card">
+      <div class="table-info-bar">
+        <span class="record-count" *ngIf="stageResponse">
+          {{ stageResponse.totalRecords }} order(s) &nbsp;·&nbsp; Page {{ stagePage + 1 }} of {{ stageResponse.totalPages }}
+        </span>
+        <span class="record-count" *ngIf="!stageResponse && !stageLoading">No data</span>
+      </div>
+      <div class="table-scroll-wrapper">
+        <ng-container *ngIf="stageLoading">
+          <div class="skeleton-block" *ngFor="let s of [1,2,3]">
+            <p-skeleton height="3rem" styleClass="mb-2" />
+          </div>
+        </ng-container>
+        <ng-container *ngIf="!stageLoading">
+          <div *ngFor="let order of stageRecords" class="order-block">
+            <div class="order-header" (click)="toggleOrder(order.productionOrderId)">
+              <div class="order-header-left">
+                <i class="pi" [ngClass]="isExpanded(order.productionOrderId) ? 'pi-chevron-down' : 'pi-chevron-right'"></i>
+                <span class="order-id">Order #{{ order.productionOrderId }}</span>
+                <span class="order-product">{{ order.productName }}</span>
+              </div>
+              <span class="stage-count-chip">{{ order.stages.length }} stage(s)</span>
+            </div>
+            <div class="stage-table-wrapper" *ngIf="isExpanded(order.productionOrderId)">
+              <table class="rpt-table stage-table">
+                <thead>
+                  <tr>
+                    <th>STAGE</th>
+                    <th class="th-center">STATUS</th>
+                    <th class="th-right">INPUT QTY</th>
+                    <th class="th-right">OUTPUT QTY</th>
+                    <th class="th-right">BALANCE QTY</th>
+                    <th class="th-center">EXECUTED AT</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let s of order.stages">
+                    <td class="td-primary-text">{{ s.stage }}</td>
+                    <td class="td-center">
+                      <span class="stage-badge" [ngClass]="stageStatusClass(s.stageStatus)">{{ s.stageStatus }}</span>
+                    </td>
+                    <td class="td-right td-num">{{ s.inputQty | number }}</td>
+                    <td class="td-right td-num td-bold">{{ s.outputQty | number }}</td>
+                    <td class="td-right td-num" [ngClass]="s.balanceQty > 0 ? 'td-orange' : 'td-green'">{{ s.balanceQty | number }}</td>
+                    <td class="td-center td-date">{{ formatDate(s.executedAt) }}</td>
+                  </tr>
+                  <tr *ngIf="!order.stages || order.stages.length === 0">
+                    <td colspan="6" class="td-center" style="color:#94a3b8;padding:1rem;">No stages found</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div *ngIf="stageRecords.length === 0">
+            <div class="empty-state">
+              <div class="empty-icon"><i class="pi pi-sitemap"></i></div>
+              <div class="empty-title">No stage progress data found</div>
+              <div class="empty-sub">Adjust filters and try again</div>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+      <!-- Pagination -->
+      <div class="pagination-bar" *ngIf="stagePages.length > 1">
+        <button class="page-btn" [disabled]="stagePage === 0" (click)="stageGoToPage(0)"><i class="pi pi-angle-double-left"></i></button>
+        <button class="page-btn" [disabled]="stagePage === 0" (click)="stageGoToPage(stagePage - 1)"><i class="pi pi-angle-left"></i></button>
+        <button *ngFor="let p of stagePages" class="page-btn" [class.page-active]="p === stagePage" (click)="stageGoToPage(p)">{{ p + 1 }}</button>
+        <button class="page-btn" [disabled]="stagePage === (stagePages.length - 1)" (click)="stageGoToPage(stagePage + 1)"><i class="pi pi-angle-right"></i></button>
+        <button class="page-btn" [disabled]="stagePage === (stagePages.length - 1)" (click)="stageGoToPage(stagePages.length - 1)"><i class="pi pi-angle-double-right"></i></button>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- ══════════════════ OUTPUT TAB ══════════════════ -->
+  <ng-container *ngIf="activeTab === 'output'">
+    <!-- KPIs -->
+    <div class="kpi-row" *ngIf="outputResponse && !outputLoading">
+      <div class="kpi-card kpi-violet">
+        <div class="kpi-icon"><i class="pi pi-tags"></i></div>
+        <div class="kpi-body">
+          <div class="kpi-label">Total Products</div>
+          <div class="kpi-value">{{ outputResponse.totalProducts }}</div>
+        </div>
+      </div>
+      <div class="kpi-card kpi-cyan kpi-highlight">
+        <div class="kpi-icon"><i class="pi pi-box"></i></div>
+        <div class="kpi-body">
+          <div class="kpi-label">Total Boxes Produced</div>
+          <div class="kpi-value">{{ outputResponse.totalBoxesProduced | number }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hint when dates not set -->
+    <div class="info-card" *ngIf="!startDate || !endDate">
+      <i class="pi pi-info-circle"></i>
+      <span>Please select both <strong>Start Date</strong> and <strong>End Date</strong> to load the Output report.</span>
+    </div>
+
+    <!-- Table -->
+    <div class="table-card" *ngIf="startDate && endDate">
+      <div class="table-info-bar">
+        <span class="record-count" *ngIf="outputResponse">
+          {{ outputResponse.totalRecords }} record(s) &nbsp;·&nbsp; Page {{ outputPage + 1 }} of {{ outputResponse.totalPages }}
+        </span>
+        <span class="record-count" *ngIf="!outputResponse && !outputLoading">No data</span>
+      </div>
+      <div class="table-scroll-wrapper">
+        <table class="rpt-table">
+          <thead>
+            <tr>
+              <th class="th-sno">S.NO</th>
+              <th>PRODUCT</th>
+              <th class="th-right">BOXES PRODUCED</th>
+              <th class="th-center">PRODUCTION DATE</th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container *ngIf="outputLoading">
+              <tr class="skeleton-row" *ngFor="let s of [1,2,3,4,5]">
+                <td *ngFor="let c of [1,2,3,4]"><p-skeleton height="1rem" /></td>
+              </tr>
+            </ng-container>
+            <ng-container *ngIf="!outputLoading">
+              <tr *ngFor="let row of outputRecords; let i = index">
+                <td class="td-sno td-center">{{ outputPage * outputPageSize + i + 1 }}</td>
+                <td class="td-primary-text">{{ row.productName }}</td>
+                <td class="td-right td-num td-bold">{{ row.boxesProduced | number }}</td>
+                <td class="td-center td-date">{{ formatDate(row.productionDate) }}</td>
+              </tr>
+              <tr *ngIf="outputRecords.length === 0">
+                <td colspan="4">
+                  <div class="empty-state">
+                    <div class="empty-icon"><i class="pi pi-inbox"></i></div>
+                    <div class="empty-title">No output records found</div>
+                    <div class="empty-sub">Adjust filters and try again</div>
+                  </div>
+                </td>
+              </tr>
+            </ng-container>
+          </tbody>
+        </table>
+      </div>
+      <div class="pagination-bar" *ngIf="outputPages.length > 1">
+        <button class="page-btn" [disabled]="outputPage === 0" (click)="outputGoToPage(0)"><i class="pi pi-angle-double-left"></i></button>
+        <button class="page-btn" [disabled]="outputPage === 0" (click)="outputGoToPage(outputPage - 1)"><i class="pi pi-angle-left"></i></button>
+        <button *ngFor="let p of outputPages" class="page-btn" [class.page-active]="p === outputPage" (click)="outputGoToPage(p)">{{ p + 1 }}</button>
+        <button class="page-btn" [disabled]="outputPage === (outputPages.length - 1)" (click)="outputGoToPage(outputPage + 1)"><i class="pi pi-angle-right"></i></button>
+        <button class="page-btn" [disabled]="outputPage === (outputPages.length - 1)" (click)="outputGoToPage(outputPages.length - 1)"><i class="pi pi-angle-double-right"></i></button>
+      </div>
+    </div>
+  </ng-container>
+
+</div>

@@ -1,0 +1,434 @@
+<div class="invoice-form-wrapper">
+  <app-page-header
+    title="Create Invoice"
+    subtitle="Create a new invoice for customer"
+    icon="file-edit">
+    <div actions>
+      <button pButton pRipple type="button" label="Back to Invoices" icon="pi pi-arrow-left" class="back-btn" (click)="onCancel()"></button>
+    </div>
+  </app-page-header>
+
+  <!-- Main Content Grid -->
+  <div class="invoice-grid">
+    <!-- Left: Form Content -->
+    <div class="form-content">
+      <form [formGroup]="invoiceForm">
+        
+        <!-- Customer Section -->
+        <div class="section-card">
+          <div class="section-label">Customer</div>
+          <div class="section-content">
+            <div class="customer-search-row">
+              <div class="search-group">
+                <div class="search-input-container">
+                  <p-autoComplete
+                    #customerAutoComplete
+                    formControlName="searchCustomer"
+                    [suggestions]="filteredCustomers"
+                    (completeMethod)="filterCustomers($event)"
+                    (onSelect)="onCustomerSelect($event.value)"
+                    (onClear)="onCustomerClear()"
+                    field="name"
+                    placeholder="Search customer..."
+                    [showClear]="true"
+                    styleClass="customer-search">
+                    <ng-template let-customer pTemplate="item">
+                      <div class="autocomplete-item">
+                        <span class="item-name">{{ customer.name }}</span>
+                        <span class="item-meta">{{ customer.phone }}</span>
+                      </div>
+                    </ng-template>
+                  </p-autoComplete>
+                </div>
+                <button
+                  pButton
+                  type="button"
+                  icon="pi pi-search"
+                  class="p-button-primary search-btn"
+                  (click)="onSearchCustomer()"
+                  pTooltip="Search customer">
+                </button>
+              </div>
+              <button
+                pButton
+                type="button"
+                label="New Customer"
+                icon="pi pi-plus"
+                class="p-button-success new-customer-btn"
+                (click)="openNewCustomerDialog()">
+              </button>
+            </div>
+
+            <!-- Add New Customer Info Box -->
+            <div class="add-customer-info-box" *ngIf="!selectedCustomer">
+              <i class="pi pi-user-plus info-icon"></i>
+              <div class="info-text">
+                <strong>Add New Customer</strong>
+                <p>Customer not found? Add new customer to the database.</p>
+              </div>
+            </div>
+
+            <!-- Selected Customer Display -->
+            <div class="selected-customer-box" *ngIf="selectedCustomer">
+              <div class="customer-details">
+                <div class="detail-row">
+                  <span class="detail-label">Name:</span>
+                  <span class="detail-value">{{ selectedCustomer.name }}</span>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">Phone:</span>
+                  <span class="detail-value">{{ selectedCustomer.phone }}</span>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">Type:</span>
+                  <span class="detail-value">{{ getCustomerTypeLabel(selectedCustomer.type) }}</span>
+                </div>
+                <div class="detail-row" *ngIf="selectedCustomer.discount">
+                  <span class="detail-label">Discount:</span>
+                  <span class="detail-value discount-text">{{ selectedCustomer.discount }}%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Invoice Items Section -->
+        <div class="section-card items-section">
+          <div class="section-header-bar">
+            <span class="section-header-title">Invoice Items</span>
+          </div>
+          <div class="card-body no-padding">
+            
+            <div class="items-container" *ngIf="selectedProducts.size > 0; else emptyItems">
+              <table class="items-table">
+                <thead>
+                  <tr>
+                    <th style="width: 30%;">Item</th>
+                    <th style="width: 15%;">Qty</th>
+                    <th style="width: 15%;">Unit</th>
+                    <th style="width: 15%;">Price</th>
+                    <th style="width: 20%;">Amount</th>
+                    <th style="width: 5%;"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of getProductsArray()">
+                    <td>
+                      <div class="item-details-compact">
+                        <div class="item-icon-small">
+                          <i class="pi pi-box"></i>
+                        </div>
+                        <div>
+                          <div class="item-name-small">{{ item.product?.name }}</div>
+                          <div class="item-category-small">{{ item.product?.category }}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <p-inputNumber
+                        [ngModel]="item.quantity"
+                        (ngModelChange)="updateQuantity(item.product!.id, $event)"
+                        [ngModelOptions]="{standalone: true}"
+                        [min]="1"
+                        [max]="1000"
+                        [showButtons]="true"
+                        buttonLayout="horizontal"
+                        incrementButtonIcon="pi pi-plus"
+                        decrementButtonIcon="pi pi-minus"
+                        styleClass="compact-number-input">
+                      </p-inputNumber>
+                    </td>
+                    <td>
+                      <p-dropdown
+                        [ngModel]="item.unitType"
+                        (ngModelChange)="updateUnitType(item.product!.id, $event)"
+                        [ngModelOptions]="{standalone: true}"
+                        [options]="[
+                          {label: 'Box', value: 'BOX'},
+                          {label: 'Case', value: 'CASE'}
+                        ]"
+                        optionLabel="label"
+                        optionValue="value"
+                        styleClass="unit-dropdown">
+                      </p-dropdown>
+                    </td>
+                    <td class="price-col">{{ formatCurrency(item.price) }}</td>
+                    <td class="amount-col">{{ formatCurrency(item.subtotal) }}</td>
+                    <td class="action-col">
+                      <button
+                        pButton
+                        type="button"
+                        icon="pi pi-trash"
+                        class="p-button-text p-button-danger p-button-sm"
+                        (click)="onRemoveProduct(item.product!.id)">
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <ng-template #emptyItems>
+              <div class="empty-items-state">
+                <i class="pi pi-inbox empty-icon"></i>
+                <p class="empty-text">No items added yet</p>
+                <small class="empty-subtext">Click "Add Item" button below to add products</small>
+              </div>
+            </ng-template>
+
+            <div class="add-item-section">
+              <button
+                pButton
+                type="button"
+                label="Add Item"
+                icon="pi pi-plus"
+                class="add-item-btn"
+                [disabled]="!selectedCustomer"
+                (click)="onAddProducts()">
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </form>
+    </div>
+
+    <!-- Right: Summary Sidebar -->
+    <div class="summary-panel">
+      <div class="summary-container">
+        <div class="summary-title">Summary</div>
+        
+        <div class="summary-body">
+          <div class="summary-row">
+            <span class="row-label">Subtotal:</span>
+            <span class="row-value">{{ formatCurrency(getSubtotal()) }}</span>
+          </div>
+          
+          <div class="summary-divider"></div>
+          
+          <div class="summary-row total-row">
+            <span class="row-label total-label">Total:</span>
+            <span class="row-value total-value">{{ formatCurrency(getTotal()) }}</span>
+          </div>
+        </div>
+
+        <div class="summary-action">
+          <button
+            pButton
+            type="button"
+            label="Create Invoice"
+            icon="pi pi-check-circle"
+            class="create-invoice-btn"
+            (click)="onSubmit()"
+            [loading]="(loading$ | async) ?? false"
+            [disabled]="!selectedCustomer || selectedProducts.size === 0">
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Product Selection Dialog -->
+  <p-dialog
+    [(visible)]="showProductDialog"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [style]="{width: '800px', maxWidth: '95vw'}">
+    
+    <ng-template pTemplate="header">
+      <div class="dialog-header-custom">
+        <div class="dialog-title">
+          <i class="pi pi-shopping-cart"></i>
+          <span>Add Product to Invoice</span>
+        </div>
+        <span class="dialog-subtitle">Select a product to add from your inventory</span>
+      </div>
+    </ng-template>
+
+    <div class="product-dialog-search">
+      <span class="p-input-icon-left full-width">
+        <i class="pi pi-search"></i>
+        <input 
+          type="text" 
+          pInputText 
+          [(ngModel)]="productSearchQuery"
+          [ngModelOptions]="{standalone: true}"
+          placeholder="Search by product name, category, or size..." 
+          class="full-width" />
+      </span>
+    </div>
+    
+    <div class="product-selection-table">
+      <div class="table-header-row">
+        <div class="col-product">Product</div>
+        <div class="col-category">Category</div>
+        <div class="col-size">Size</div>
+        <div class="col-price">Price (per Box)</div>
+        <div class="col-action"></div>
+      </div>
+
+      <div class="table-body">
+        <div 
+          *ngFor="let product of getFilteredProducts()"
+          class="table-row"
+          (click)="onProductSelect(product)">
+          <div class="col-product">
+            <div class="product-icon-wrapper">
+              <i class="pi pi-box"></i>
+            </div>
+            <div class="product-info">
+              <div class="product-name">{{ product.name }}</div>
+            </div>
+          </div>
+          <div class="col-category">
+            <p-tag 
+              [value]="getCategoryLabel(product.category)" 
+              [severity]="getCategorySeverity(product.category)">
+            </p-tag>
+          </div>
+          <div class="col-size">
+            <span class="size-text">{{ product.size }}</span>
+          </div>
+          <div class="col-price">
+            <span class="price-value">{{ formatCurrency(getProductPrice(product.id)) }}</span>
+          </div>
+          <div class="col-action">
+            <button 
+              pButton 
+              type="button" 
+              icon="pi pi-plus" 
+              class="p-button-rounded p-button-sm add-product-btn"
+              (click)="onProductAdd(product); $event.stopPropagation()">
+            </button>
+          </div>
+        </div>
+
+        <div *ngIf="getFilteredProducts().length === 0 && productSearchQuery" class="no-products-found">
+          <i class="pi pi-search"></i>
+          <p>No products found matching "{{ productSearchQuery }}"</p>
+          <small>Try different search terms or check your spelling</small>
+        </div>
+
+        <div *ngIf="getAvailableProducts().length === 0 && !productSearchQuery" class="no-products-found">
+          <i class="pi pi-check-circle"></i>
+          <p>All products added to invoice</p>
+          <small>You can remove items from the invoice to add different products</small>
+        </div>
+      </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <div class="product-dialog-footer">
+        <span class="products-count">{{ getAvailableProducts().length }} product(s) available</span>
+        <button
+          pButton
+          type="button"
+          label="Close"
+          icon="pi pi-times"
+          class="p-button-outlined p-button-secondary"
+          (click)="showProductDialog = false">
+        </button>
+      </div>
+    </ng-template>
+  </p-dialog>
+
+  <!-- New Customer Dialog -->
+  <p-dialog
+    [(visible)]="showNewCustomerDialog"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [style]="{width: '700px', maxWidth: '95vw'}">
+    
+    <ng-template pTemplate="header">
+      <div class="dialog-header-custom">
+        <div class="dialog-title">
+          <i class="pi pi-user-plus"></i>
+          <span>Add New Customer</span>
+        </div>
+        <span class="dialog-subtitle">Enter customer details to add to your database</span>
+      </div>
+    </ng-template>
+
+    <form [formGroup]="newCustomerForm">
+      <div class="dialog-form-grid">
+        <div class="dialog-form-field">
+          <label>Name <span class="required">*</span></label>
+          <input pInputText formControlName="name" placeholder="Enter customer name" />
+        </div>
+
+        <div class="dialog-form-field">
+          <label>Phone <span class="required">*</span></label>
+          <input pInputText formControlName="phone" placeholder="10-digit phone number" />
+        </div>
+
+        <div class="dialog-form-field full-width">
+          <label>Address <span class="required">*</span></label>
+          <textarea pInputTextarea formControlName="address" placeholder="Enter full address" rows="2"></textarea>
+        </div>
+
+        <div class="dialog-form-field">
+          <label>District <span class="required">*</span></label>
+          <input pInputText formControlName="district" placeholder="Enter district" />
+        </div>
+
+        <div class="dialog-form-field">
+          <label>State <span class="required">*</span></label>
+          <input pInputText formControlName="state" placeholder="Enter state" />
+        </div>
+
+        <div class="dialog-form-field">
+          <label>Country <span class="required">*</span></label>
+          <input pInputText formControlName="country" placeholder="Enter country" />
+        </div>
+
+        <div class="dialog-form-field">
+          <label>ZIP Code <span class="required">*</span></label>
+          <input pInputText formControlName="zipCode" placeholder="6-digit PIN code" />
+        </div>
+
+        <div class="dialog-form-field">
+          <label>Customer Type <span class="required">*</span></label>
+          <p-dropdown
+            formControlName="type"
+            [options]="[
+              {label: 'Distributor', value: 'DISTRIBUTOR'},
+              {label: 'Dealer', value: 'DEALER'},
+              {label: 'Direct Customer', value: 'DIRECT_CUSTOMER'}
+            ]"
+            placeholder="Select type"
+            optionLabel="label"
+            optionValue="value"
+            appendTo="body">
+          </p-dropdown>
+        </div>
+
+        <div class="dialog-form-field">
+          <label>Default Discount (%)</label>
+          <p-inputNumber formControlName="discount" [min]="0" [max]="100" suffix="%" />
+        </div>
+      </div>
+    </form>
+
+    <ng-template pTemplate="footer">
+      <button
+        pButton
+        type="button"
+        label="Cancel"
+        icon="pi pi-times"
+        class="p-button-outlined p-button-secondary customer-cancel-btn"
+        (click)="showNewCustomerDialog = false">
+      </button>
+      <button
+        pButton
+        type="button"
+        label="Create Customer"
+        icon="pi pi-check"
+        class="customer-create-btn"
+        (click)="onCreateNewCustomer()"
+        [disabled]="newCustomerForm.invalid">
+      </button>
+    </ng-template>
+  </p-dialog>
+</div>

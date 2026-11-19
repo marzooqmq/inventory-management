@@ -1,0 +1,145 @@
+<div class="dashboard">
+  <header class="dashboard-header">
+    <div>
+      <p class="eyebrow">{{ roleTitle }} workspace</p>
+      <h1>Welcome back, {{ displayName }}</h1>
+      <p class="dashboard-date">{{ currentDate | date:'EEEE, d MMMM y' }} · Here's your latest overview.</p>
+    </div>
+    <button class="refresh-button" type="button" (click)="loadDashboard()" [disabled]="salesLoading || inventoryLoading || lowStockLoading || stagesLoading">
+      <i class="pi pi-refresh" [class.spinning]="salesLoading || inventoryLoading || lowStockLoading || stagesLoading"></i>
+      <span>Refresh</span>
+    </button>
+  </header>
+
+  <section class="metrics-grid" aria-label="Key metrics">
+    <a class="metric-card" *ngFor="let metric of metrics" [routerLink]="metric.route">
+      <span class="metric-icon" [ngClass]="metric.color"><i [class]="metric.icon"></i></span>
+      <span class="metric-copy">
+        <span class="metric-label">{{ metric.label }}</span>
+        <span class="metric-value">
+          <span *ngIf="metric.loading" class="loading-value">Loading</span>
+          <ng-container *ngIf="!metric.loading">{{ metric.value }}</ng-container>
+        </span>
+        <span class="metric-note">{{ metric.note }}</span>
+      </span>
+      <i class="pi pi-arrow-up-right metric-link" aria-hidden="true"></i>
+    </a>
+  </section>
+
+  <div class="dashboard-grid">
+    <section class="panel quick-actions-panel">
+      <div class="panel-heading">
+        <div>
+          <h2>Quick actions</h2>
+          <p>Go straight to the tasks you use most.</p>
+        </div>
+      </div>
+      <div class="quick-actions">
+        <a class="action-card" *ngFor="let action of quickActions" [routerLink]="action.route">
+          <span class="action-icon"><i [class]="action.icon"></i></span>
+          <span class="action-copy">
+            <span class="action-title">{{ action.label }}</span>
+            <span class="action-description">{{ action.description }}</span>
+          </span>
+          <i class="pi pi-chevron-right action-arrow" aria-hidden="true"></i>
+        </a>
+        <p class="empty-note" *ngIf="quickActions.length === 0">No quick actions are configured for this account.</p>
+      </div>
+    </section>
+
+    <section class="panel alerts-panel" *ngIf="hasInventoryAccess">
+      <div class="panel-heading">
+        <div>
+          <h2>Needs attention</h2>
+          <p>Stock and production items that may need follow-up.</p>
+        </div>
+        <a routerLink="/inventory-dashboard" class="panel-link">View inventory <i class="pi pi-arrow-right"></i></a>
+      </div>
+
+      <div class="panel-message error-message" *ngIf="inventoryError || lowStockError">
+        <i class="pi pi-exclamation-circle"></i>
+        <span>Some inventory information could not be loaded.</span>
+        <button type="button" (click)="retryInventory()">Retry</button>
+      </div>
+
+      <div class="panel-message loading-message" *ngIf="!inventoryError && !lowStockError && (inventoryLoading || lowStockLoading)">
+        <i class="pi pi-spin pi-spinner"></i> Loading inventory status…
+      </div>
+
+      <ng-container *ngIf="!inventoryLoading && !lowStockLoading && !inventoryError && !lowStockError">
+        <a class="attention-item" *ngFor="let item of lowStockItems | slice:0:5" routerLink="/inventory-dashboard">
+          <span class="severity-dot" [ngClass]="item.severity.toLowerCase()"></span>
+          <span class="attention-copy">
+            <span class="attention-title">{{ item.itemName }}</span>
+            <span class="attention-description">{{ item.itemType.replace('_', ' ') }} · {{ formatNumber(item.currentQuantity) }} remaining</span>
+          </span>
+          <span class="attention-status">{{ item.severity }}</span>
+        </a>
+
+        <div class="all-clear" *ngIf="lowStockItems.length === 0">
+          <i class="pi pi-check-circle"></i>
+          <span>No low-stock alerts right now.</span>
+        </div>
+
+        <div class="production-status" *ngIf="productionStages">
+          <span class="status-icon"><i class="pi pi-cog"></i></span>
+          <span>
+            <strong>{{ formatNumber(productionStages.totalActive) }}</strong>
+            <span> active production stages</span>
+          </span>
+          <span class="status-note" *ngIf="productionStages.completedCount > 0">
+            {{ formatNumber(productionStages.completedCount) }} completed
+          </span>
+        </div>
+
+        <div class="panel-message error-message" *ngIf="stagesError">
+          <span>Production stage status could not be loaded.</span>
+          <button type="button" (click)="retryStages()">Retry</button>
+        </div>
+      </ng-container>
+    </section>
+
+    <section class="panel invoices-panel" *ngIf="hasSalesAccess">
+      <div class="panel-heading">
+        <div>
+          <h2>Recent invoices</h2>
+          <p>Your latest customer transactions.</p>
+        </div>
+        <a routerLink="/invoices" class="panel-link">All invoices <i class="pi pi-arrow-right"></i></a>
+      </div>
+
+      <div class="panel-message error-message" *ngIf="salesError">
+        <i class="pi pi-exclamation-circle"></i>
+        <span>Sales information could not be loaded.</span>
+        <button type="button" (click)="retrySales()">Retry</button>
+      </div>
+
+      <div class="panel-message loading-message" *ngIf="salesLoading">
+        <i class="pi pi-spin pi-spinner"></i> Loading recent invoices…
+      </div>
+
+      <div class="invoice-list" *ngIf="!salesLoading && !salesError">
+        <a class="invoice-row" *ngFor="let invoice of recentInvoices" [routerLink]="['/invoices', invoice.id]">
+          <span class="invoice-icon"><i class="pi pi-file-invoice"></i></span>
+          <span class="invoice-copy">
+            <span class="invoice-number">{{ invoice.invoiceNumber }}</span>
+            <span class="invoice-customer">{{ invoice.customerName }} · {{ invoice.invoiceDate | date:'d MMM y' }}</span>
+          </span>
+          <span class="invoice-amount">
+            <strong>{{ formatCurrency(invoice.netAmount) }}</strong>
+            <span [ngClass]="invoice.paymentStatus.toLowerCase()">{{ invoice.paymentStatus.replace('_', ' ') }}</span>
+          </span>
+        </a>
+
+        <div class="all-clear" *ngIf="recentInvoices.length === 0">
+          <i class="pi pi-info-circle"></i>
+          <span>No recent invoices to display.</span>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <p class="source-note" *ngIf="salesError || inventoryError">
+    Dashboard data may be incomplete. Use Retry in the affected section to try again.
+  </p>
+</div>

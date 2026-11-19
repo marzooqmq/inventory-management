@@ -1,0 +1,254 @@
+<div class="invoice-detail-wrapper" *ngIf="invoice$ | async as invoice">
+  <app-page-header
+    [title]="'Invoice ' + invoice.invoiceNumber"
+    subtitle="View and manage invoice details"
+    icon="file-invoice">
+    <div actions class="header-actions">
+      <button 
+        pButton 
+        label="Back to List" 
+        icon="pi pi-arrow-left"
+        class="p-button-outlined p-button-secondary action-btn-header"
+        (click)="onBack()">
+      </button>
+      <button 
+        pButton 
+        label="Print" 
+        icon="pi pi-print"
+        class="p-button-outlined action-btn-header btn-print"
+        (click)="onPrint()">
+      </button>
+      <button 
+        pButton 
+        label="Download PDF" 
+        icon="pi pi-download"
+        class="p-button-outlined action-btn-header btn-download"
+        (click)="onDownloadPdf()">
+      </button>
+      <button 
+        pButton 
+        label="Cancel Invoice" 
+        icon="pi pi-times"
+        class="p-button-danger action-btn-header"
+        *ngIf="canCancelInvoice(invoice)"
+        (click)="onCancelInvoice(invoice)">
+      </button>
+    </div>
+  </app-page-header>
+
+  <div class="detail-content">
+    <!-- Compact Two-Column Layout -->
+    <div class="main-grid">
+      <!-- Left Column: Invoice Details & Items -->
+      <div class="left-column">
+        <!-- Info Bar -->
+        <div class="info-bar">
+          <div class="info-fields">
+            <div class="info-section">
+              <span class="info-icon"><i class="pi pi-user"></i></span>
+              <div class="info-text">
+                <div class="info-label">Customer</div>
+                <div class="info-value">{{ invoice.customerName }}</div>
+              </div>
+            </div>
+            <div class="info-divider"></div>
+            <div class="info-section">
+              <span class="info-icon"><i class="pi pi-phone"></i></span>
+              <div class="info-text">
+                <div class="info-label">Phone</div>
+                <div class="info-value">{{ invoice.phoneNumber }}</div>
+              </div>
+            </div>
+            <div class="info-divider"></div>
+            <div class="info-section">
+              <span class="info-icon"><i class="pi pi-calendar"></i></span>
+              <div class="info-text">
+                <div class="info-label">Date</div>
+                <div class="info-value">{{ formatDate(invoice.invoiceDate) }}</div>
+              </div>
+            </div>
+          </div>
+          <div class="info-badges">
+            <p-tag 
+              [value]="invoice.status" 
+              [severity]="getStatusSeverity(invoice.status)">
+            </p-tag>
+            <p-tag 
+              [value]="getPaymentStatusLabel(invoice.paymentStatus)" 
+              [severity]="getPaymentSeverity(invoice.paymentStatus)">
+            </p-tag>
+          </div>
+        </div>
+
+        <!-- Items Table -->
+        <div class="items-section">
+          <div class="section-header">
+            <i class="pi pi-shopping-cart"></i>
+            <span>Invoice Items</span>
+          </div>
+          
+          <div class="table-container">
+            <table class="detail-table">
+              <thead>
+                <tr>
+                  <th>S.NO.</th>
+                  <th>PRODUCT</th>
+                  <th>QUANTITY</th>
+                  <th>UNIT TYPE</th>
+                  <th>QTY IN BOXES</th>
+                  <th>RATE</th>
+                  <th>TOTAL</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of invoice.items; let i = index">
+                  <td class="td-center">{{ i + 1 }}</td>
+                  <td class="td-product">{{ item.productName }}</td>
+                  <td class="td-center td-qty">{{ item.quantity }}</td>
+                  <td class="td-center">
+                    <p-tag 
+                      [value]="item.unitType" 
+                      [severity]="item.unitType === 'CASE' ? 'info' : 'secondary'">
+                    </p-tag>
+                  </td>
+                  <td class="td-center td-qty">{{ item.quantityInBoxes }}</td>
+                  <td class="td-amount">{{ formatCurrency(item.rate) }}</td>
+                  <td class="td-amount td-total">{{ formatCurrency(item.total) }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Amount Summary (Sticky) -->
+      <div class="right-column">
+        <div class="summary-card sticky-summary">
+          <div class="section-header">
+            <i class="pi pi-calculator"></i>
+            <span>Amount Summary</span>
+          </div>
+          
+          <div class="summary-content">
+            <div class="sum-row">
+              <span class="sum-label">Subtotal</span>
+              <span class="sum-value">{{ formatCurrency(invoice.totalAmount) }}</span>
+            </div>
+            
+            <div class="sum-row" *ngIf="invoice.discount > 0">
+              <span class="sum-label">Discount</span>
+              <span class="sum-value discount-val">-{{ formatCurrency(invoice.discount) }}</span>
+            </div>
+            
+            <div class="sum-row sum-total">
+              <span class="sum-label">Net Amount</span>
+              <span class="sum-value">{{ formatCurrency(invoice.netAmount) }}</span>
+            </div>
+            
+            <div class="sum-row sum-paid" *ngIf="invoice.paidAmount && invoice.paidAmount > 0">
+              <span class="sum-label">Paid Amount</span>
+              <span class="sum-value paid-val">{{ formatCurrency(invoice.paidAmount) }}</span>
+            </div>
+            
+            <div class="sum-row sum-remaining" *ngIf="getRemainingAmount(invoice) > 0">
+              <span class="sum-label">Balance Due</span>
+              <span class="sum-value remaining-val">{{ formatCurrency(getRemainingAmount(invoice)) }}</span>
+            </div>
+
+            <button 
+              pButton 
+              label="Add Payment" 
+              icon="pi pi-money-bill"
+              class="payment-btn"
+              *ngIf="canAddPayment(invoice)"
+              (click)="onAddPayment()">
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Payment Dialog - Modern Design -->
+  <p-dialog 
+    [(visible)]="showPaymentDialog"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [closable]="true"
+    [style]="{width: '480px', maxWidth: '95vw'}"
+    styleClass="modern-payment-dialog">
+    <ng-template pTemplate="header">
+      <div class="dialog-header-content">
+        <div class="header-icon">
+          <i class="pi pi-money-bill"></i>
+        </div>
+        <div class="header-text">
+          <h3>Add Payment</h3>
+          <p>Invoice {{ invoice.invoiceNumber }}</p>
+        </div>
+      </div>
+    </ng-template>
+    
+    <form [formGroup]="paymentForm" (ngSubmit)="submitPayment(invoice)">
+      <div class="payment-summary-card">
+        <div class="summary-row">
+          <span class="label">Invoice Amount</span>
+          <span class="value">{{ formatCurrency(invoice.netAmount) }}</span>
+        </div>
+        <div class="summary-row" *ngIf="invoice.paidAmount && invoice.paidAmount > 0">
+          <span class="label">Already Paid</span>
+          <span class="value paid">{{ formatCurrency(invoice.paidAmount) }}</span>
+        </div>
+        <div class="summary-row highlight">
+          <span class="label">Balance Due</span>
+          <span class="value due">{{ formatCurrency(getRemainingAmount(invoice)) }}</span>
+        </div>
+      </div>
+
+      <div class="payment-input-section">
+        <label for="paidAmount" class="input-label">
+          Payment Amount <span class="required">*</span>
+        </label>
+        <p-inputNumber
+          id="paidAmount"
+          formControlName="paidAmount"
+          (ngModelChange)="paymentError = ''"
+          prefix="₹ "
+          [minFractionDigits]="2"
+          [maxFractionDigits]="2"
+          [min]="0.01"
+          placeholder="Enter amount"
+          [showButtons]="false"
+          styleClass="modern-input">
+        </p-inputNumber>
+        <small class="input-hint" *ngIf="!paymentError">
+          Maximum: {{ formatCurrency(getRemainingAmount(invoice)) }}
+        </small>
+        <small class="field-error" *ngIf="paymentError">
+          <i class="pi pi-exclamation-circle"></i> {{ paymentError }}
+        </small>
+      </div>
+
+      <div class="dialog-footer-actions">
+        <button 
+          pButton 
+          type="button"
+          label="Cancel" 
+          class="p-button-outlined p-button-secondary btn-cancel-modal"
+          (click)="showPaymentDialog = false">
+        </button>
+        <button 
+          pButton 
+          type="submit"
+          label="Add Payment" 
+          icon="pi pi-check"
+          class="btn-submit-modal"
+          [disabled]="paymentForm.invalid">
+        </button>
+      </div>
+    </form>
+  </p-dialog>
+
+  <app-confirm-dialog></app-confirm-dialog>
+</div>

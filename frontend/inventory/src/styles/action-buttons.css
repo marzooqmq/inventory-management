@@ -1,0 +1,200 @@
+/* ===== STANDARD ACTION BUTTONS ===== */
+/* Enterprise-standard edit and delete button styles */
+/* Apply to all list components across the application */
+
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Action Group Container */
+.action-group {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Base Action Button */
+.btn-action {
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #e2e8f0;
+  border-radius: 7px;
+  background: #ffffff;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 0.875rem;
+  padding: 0;
+  outline: none;
+  position: relative;
+  z-index: 1;
+  overflow: visible;
+}
+
+.btn-action:focus {
+  outline: none;
+}
+
+.btn-action:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  z-index: 2;
+}
+
+.btn-action:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+/* Edit Button - Blue Theme */
+.btn-edit,
+.btn-action.edit-btn {
+  border-color: #e2e8f0;
+  background: #ffffff;
+  color: #64748b;
+}
+
+.btn-edit:hover,
+.btn-action.edit-btn:hover {
+  background: #eff6ff;
+  border-color: #3b82f6;
+  color: #2563eb;
+}
+
+.btn-edit:active,
+.btn-action.edit-btn:active {
+  background: #dbeafe;
+  border-color: #2563eb;
+  color: #1e40af;
+}
+
+/* Delete Button - Red Theme */
+.btn-delete,
+.btn-action.delete-btn {
+  border-color: #e2e8f0;
+  background: #ffffff;
+  color: #64748b;
+}
+
+.btn-delete:hover,
+.btn-action.delete-btn:hover {
+  background: #fef2f2;
+  border-color: #ef4444;
+  color: #dc2626;
+}
+
+.btn-delete:active,
+.btn-action.delete-btn:active {
+  background: #fee2e2;
+  border-color: #dc2626;
+  color: #b91c1c;
+}
+
+/* Disabled State */
+.btn-action:disabled,
+.btn-action.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Icon inside button */
+.btn-action i {
+  font-size: 0.875rem;
+  line-height: 1;
+}
+
+/* PrimeNG Button Compatibility */
+:host ::ng-deep .p-button.btn-action {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  min-width: 34px;
+}
+
+:host ::ng-deep .p-button.btn-edit,
+:host ::ng-deep .p-button.btn-action.p-button-info {
+  background: #ffffff;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+}
+
+:host ::ng-deep .p-button.btn-edit:hover,
+:host ::ng-deep .p-button.btn-action.p-button-info:hover {
+  background: #eff6ff;
+  border-color: #3b82f6;
+  color: #2563eb;
+}
+
+:host ::ng-deep .p-button.btn-delete,
+:host ::ng-deep .p-button.btn-action.p-button-danger {
+  background: #ffffff;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+}
+
+:host ::ng-deep .p-button.btn-delete:hover,
+:host ::ng-deep .p-button.btn-action.p-button-danger:hover {
+  background: #fef2f2;
+  border-color: #ef4444;
+  color: #dc2626;
+}
+
+/* Rounded Button Variants */
+:host ::ng-deep .p-button.p-button-rounded.p-button-text {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+}
+
+:host ::ng-deep .p-button.p-button-rounded.p-button-text .p-button-icon {
+  font-size: 0.875rem;
+}
+
+:host ::ng-deep .p-button.p-button-info.p-button-rounded.p-button-text {
+  color: #64748b;
+}
+
+:host ::ng-deep .p-button.p-button-info.p-button-rounded.p-button-text:hover {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+:host ::ng-deep .p-button.p-button-danger.p-button-rounded.p-button-text {
+  color: #64748b;
+}
+
+:host ::ng-deep .p-button.p-button-danger.p-button-rounded.p-button-text:hover {
+  background: #fef2f2;
+  color: #dc2626;
+}
+/* PrimeNG Tooltip Fix - Force Horizontal Text Display */
+:host ::ng-deep .p-tooltip {
+  white-space: nowrap !important;
+  word-break: keep-all !important;
+  writing-mode: horizontal-tb !important;
+  text-orientation: mixed !important;
+  direction: ltr !important;
+}
+
+:host ::ng-deep .p-tooltip .p-tooltip-text {
+  white-space: nowrap !important;
+  word-break: keep-all !important;
+  display: inline-block !important;
+  writing-mode: horizontal-tb !important;
+  text-orientation: mixed !important;
+  direction: ltr !important;
+  letter-spacing: normal !important;
+  word-spacing: normal !important;
+}
+
+:host ::ng-deep .p-tooltip .p-tooltip-arrow {
+  display: block !important;
+}

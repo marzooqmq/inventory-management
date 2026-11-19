@@ -1,0 +1,128 @@
+<div class="user-form-container">
+  <app-page-header
+    [title]="isEditMode ? 'Edit User' : 'Add New User'"
+    [subtitle]="isEditMode ? 'Update user information' : 'Create a new user account'"
+    icon="users">
+  </app-page-header>
+
+  <div class="form-card">
+    <p-card>
+      <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+        <div class="form-grid">
+          <!-- Username -->
+          <div class="form-field">
+            <label for="username" class="field-label">
+              Username <span class="required">*</span>
+            </label>
+            <input
+              id="username"
+              type="text"
+              pInputText
+              formControlName="username"
+              placeholder="Enter username"
+              [class.invalid]="isFieldInvalid('username')" />
+            <small class="error-message" *ngIf="isFieldInvalid('username')">
+              {{ getFieldError('username') }}
+            </small>
+            <small class="field-hint" *ngIf="isEditMode && !isFieldInvalid('username')">
+              Username cannot be changed
+            </small>
+          </div>
+
+          <!-- Role -->
+          <div class="form-field">
+            <label for="role" class="field-label">
+              Role <span class="required">*</span>
+            </label>
+            <p-dropdown
+              id="role"
+              formControlName="role"
+              [options]="roleOptions"
+              placeholder="Select a role"
+              optionLabel="label"
+              optionValue="value"
+              [showClear]="true"
+              [class.invalid]="isFieldInvalid('role')">
+            </p-dropdown>
+            <small class="error-message" *ngIf="isFieldInvalid('role')">
+              {{ getFieldError('role') }}
+            </small>
+          </div>
+
+          <!-- Password (only for new users) -->
+          <div class="form-field" *ngIf="!isEditMode">
+            <label for="password" class="field-label">
+              Password <span class="required">*</span>
+            </label>
+            <p-password
+              id="password"
+              formControlName="password"
+              placeholder="Enter password"
+              [toggleMask]="true"
+              [feedback]="false"
+              inputStyleClass="password-input"
+              [class.invalid]="isFieldInvalid('password')">
+            </p-password>
+            <small class="error-message" *ngIf="isFieldInvalid('password')">
+              {{ getFieldError('password') }}
+            </small>
+            <small class="field-hint" *ngIf="!isFieldInvalid('password')">
+              Minimum 6 characters required
+            </small>
+          </div>
+
+          <!-- Confirm Password (only for new users) -->
+          <div class="form-field" *ngIf="!isEditMode">
+            <label for="confirmPassword" class="field-label">
+              Confirm Password <span class="required">*</span>
+            </label>
+            <p-password
+              id="confirmPassword"
+              formControlName="confirmPassword"
+              placeholder="Re-enter password"
+              [toggleMask]="true"
+              [feedback]="false"
+              inputStyleClass="password-input"
+              [class.invalid]="isFieldInvalid('confirmPassword')">
+            </p-password>
+            <small class="error-message" *ngIf="isFieldInvalid('confirmPassword')">
+              {{ getFieldError('confirmPassword') }}
+            </small>
+          </div>
+        </div>
+
+        <!-- Info Box for Edit Mode -->
+        <div class="info-box" *ngIf="isEditMode">
+          <i class="pi pi-info-circle"></i>
+          <div class="info-content">
+            <strong>Note:</strong>
+            <p>Only the user role can be updated. To change the password, please use the Change Password feature.</p>
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <button
+            pButton
+            pRipple
+            type="button"
+            label="Cancel"
+            icon="pi pi-times"
+            class="p-button-text p-button-secondary"
+            (click)="onCancel()">
+          </button>
+          <button
+            pButton
+            pRipple
+            type="submit"
+            [label]="isEditMode ? 'Update User' : 'Create User'"
+            icon="pi pi-check"
+            class="p-button-primary"
+            [loading]="submitting"
+            [disabled]="userForm.invalid">
+          </button>
+        </div>
+      </form>
+    </p-card>
+  </div>
+</div>

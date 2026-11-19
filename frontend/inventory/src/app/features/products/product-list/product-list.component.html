@@ -1,0 +1,124 @@
+<div class="product-list-container">
+  <app-page-header
+    title="Products"
+    subtitle="Manage your product catalog"
+    icon="shopping-bag"
+    [showAddButton]="true"
+    addButtonLabel="Add Product"
+    (onAdd)="onAddProduct()">
+    <div actions class="search-wrapper">
+      <i class="pi pi-search search-icon"></i>
+      <input 
+        type="text" 
+        [formControl]="searchControl"
+        placeholder="Search products..." 
+        class="modern-search" />
+    </div>
+  </app-page-header>
+
+  <!-- Products Table -->
+  <div class="table-wrapper">
+    <div class="modern-table-container">
+    <table class="modern-table">
+      <thead>
+        <tr>
+          <th class="cell-index">S.NO.</th>
+          <th class="cell-product">PRODUCT</th>
+          <th class="cell-category">CATEGORY</th>
+          <th class="cell-specs">SPECIFICATIONS</th>
+          <th class="cell-pricing">PRICING</th>
+          <th class="cell-status">STATUS</th>
+          <th class="cell-actions">ACTIONS</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let product of (filteredProducts$ | async); let i = index" class="table-row">
+          <td class="cell-index">
+            <span class="sno-text">{{ i + 1 }}</span>
+          </td>
+          
+          <td class="cell-product">
+            <div class="product-info">
+              <div class="product-name">{{ product.name }}</div>
+              <div class="product-description" *ngIf="product.description">
+                {{ product.description }}
+              </div>
+            </div>
+          </td>
+          
+          <td class="cell-category">
+            <p-tag 
+              [value]="getCategoryLabel(product.category)" 
+              [severity]="getCategorySeverity(product.category)">
+            </p-tag>
+          </td>
+          
+          <td class="cell-specs">
+            <div class="spec-group">
+              <div class="spec-item">
+                <span class="spec-label">SIZE</span>
+                <span class="spec-value">{{ product.size }}</span>
+              </div>
+              <div class="spec-item">
+                <span class="spec-label">PADS</span>
+                <span class="spec-value">{{ product.padsPerBox }}</span>
+              </div>
+            </div>
+          </td>
+          
+          <td class="cell-pricing">
+            <div class="pricing-group">
+              <div class="price-row">
+                <span class="price-label">MRP</span>
+                <span class="price-value price-mrp">₹{{ product.mrp || '0' }}</span>
+              </div>
+              <div class="price-row">
+                <span class="price-label">Cost</span>
+                <span class="price-value price-cost">₹{{ product.costPrice || '0' }}</span>
+              </div>
+            </div>
+          </td>
+          
+          <td class="cell-status">
+            <span class="status-indicator" [class.active]="product.active" [class.inactive]="!product.active">
+              <span class="status-dot"></span>
+              <span class="status-text">{{ product.active ? 'Active' : 'Inactive' }}</span>
+            </span>
+          </td>
+          
+          <td class="cell-actions">
+            <div class="action-group">
+              <button class="btn-action btn-edit" (click)="onEditProduct(product.id)" 
+                      pTooltip="Edit" tooltipPosition="top">
+                <i class="pi pi-pencil"></i>
+              </button>
+              <button class="btn-action btn-delete" (click)="onDeleteProduct(product)" 
+                      pTooltip="Delete" tooltipPosition="top">
+                <i class="pi pi-trash"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+
+        <!-- Empty State -->
+        <tr *ngIf="(filteredProducts$ | async)?.length === 0">
+          <td colspan="7" class="empty-state">
+            <div class="empty-content">
+              <i class="pi pi-inbox empty-icon"></i>
+              <p class="empty-text">No products found</p>
+              <button pButton label="Add Product" icon="pi pi-plus" 
+                      class="p-button-primary" (click)="onAddProduct()"></button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" *ngIf="loading$ | async">
+    <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
+  </div>
+</div>
+
+<app-confirm-dialog></app-confirm-dialog>

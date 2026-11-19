@@ -1,0 +1,13 @@
+<div class="main-layout">
+  <app-sidebar (collapsedChange)="onSidebarCollapsedChange($event)"></app-sidebar>
+  <div class="layout-content" [class.sidebar-collapsed]="isSidebarCollapsed">
+    <app-header></app-header>
+    
+    <main class="main-content">
+      <app-report-switcher *ngIf="router.url.startsWith('/reports/')"></app-report-switcher>
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>
+
+<p-toast position="top-right"></p-toast>

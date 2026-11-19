@@ -1,0 +1,63 @@
+<div class="app-header">
+  <div class="header-content">
+    <!-- Left Section: Logo -->
+    <div class="brand-section">
+      <img src="assets/images/Way2care_logo.png" alt="Way2Care" class="brand-logo">
+    </div>
+
+    <!-- Right Section: Actions & User -->
+    <div class="header-actions">
+      <!-- Notifications -->
+      <div class="notification-wrapper">
+        <button 
+          class="action-btn notification-btn" 
+          pButton 
+          pRipple 
+          icon="pi pi-bell"
+          (click)="toggleNotificationPanel()">
+        </button>
+        <span class="notification-badge" *ngIf="(unreadNotificationsCount$ | async) as count">
+          {{ count }}
+        </span>
+      </div>
+      
+      <!-- Notification Panel Dropdown -->
+      <app-notification-panel 
+        [(visible)]="showNotificationPanel">
+      </app-notification-panel>
+      
+      <!-- Divider -->
+      <div class="header-divider"></div>
+      
+      <!-- User Menu -->
+      <div class="user-menu-section">
+        <button 
+          class="user-menu-btn"
+          pButton 
+          pRipple
+          (click)="menu.toggle($event)">
+          <div class="user-avatar">
+            <i class="pi pi-user"></i>
+          </div>
+          <div class="user-info" *ngIf="currentUser">
+            <span class="user-name">{{ currentUser.username }}</span>
+            <span class="user-role">{{ getRoleDisplayName() }}</span>
+          </div>
+          <div class="user-info" *ngIf="!currentUser">
+            <span class="user-name">Guest</span>
+            <span class="user-role">Visitor</span>
+          </div>
+          <i class="pi pi-chevron-down dropdown-icon"></i>
+        </button>
+        
+        <p-menu 
+          #menu 
+          [model]="userMenuItems" 
+          [popup]="true"
+          appendTo="body"
+          styleClass="custom-user-menu">
+        </p-menu>
+      </div>
+    </div>
+  </div>
+</div>

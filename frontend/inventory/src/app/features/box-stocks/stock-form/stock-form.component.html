@@ -1,0 +1,99 @@
+<div class="box-stock-form-container">
+  <app-page-header
+    [title]="isEditMode ? 'Edit Box Stock' : 'Add Box Stock'"
+    [subtitle]="isEditMode ? 'Update box stock quantity' : 'Add new box stock entry'"
+    icon="warehouse">
+  </app-page-header>
+
+  <div class="form-card">
+    <p-card>
+      <form [formGroup]="boxStockForm" (ngSubmit)="onSubmit()">
+        <div class="form-grid">
+          <!-- Box -->
+          <div class="form-field full-width">
+            <label for="boxId" class="field-label">
+              Box <span class="required">*</span>
+            </label>
+            <p-dropdown
+              id="boxId"
+              formControlName="boxId"
+              [options]="(boxes$ | async) || []"
+              optionLabel="productName"
+              optionValue="id"
+              placeholder="Select box"
+              [showClear]="true"
+              [filter]="true"
+              filterBy="productName"
+              [class.invalid]="isFieldInvalid('boxId')">
+            </p-dropdown>
+            <small class="field-help">Select the box to track stock for</small>
+            <small class="error-message" *ngIf="isFieldInvalid('boxId')">
+              {{ getErrorMessage('boxId') }}
+            </small>
+          </div>
+
+          <!-- Quantity -->
+          <div class="form-field full-width">
+            <label for="quantity" class="field-label">
+              Quantity <span class="required">*</span>
+            </label>
+            <p-inputNumber
+              id="quantity"
+              formControlName="quantity"
+              [min]="0"
+              [showButtons]="true"
+              buttonLayout="stacked"
+              [class.invalid]="isFieldInvalid('quantity')">
+            </p-inputNumber>
+            <small class="field-help">Enter the current stock quantity</small>
+            <small class="error-message" *ngIf="isFieldInvalid('quantity')">
+              {{ getErrorMessage('quantity') }}
+            </small>
+          </div>
+
+          <!-- Minimum Stock Level -->
+          <div class="form-field full-width">
+            <label for="minStockLevel" class="field-label">
+              Minimum Stock Level <span class="required">*</span>
+            </label>
+            <p-inputNumber
+              id="minStockLevel"
+              formControlName="minStockLevel"
+              [min]="0"
+              [showButtons]="true"
+              buttonLayout="stacked"
+              [class.invalid]="isFieldInvalid('minStockLevel')">
+            </p-inputNumber>
+            <small class="field-help">Enter the minimum stock level threshold</small>
+            <small class="error-message" *ngIf="isFieldInvalid('minStockLevel')">
+              {{ getErrorMessage('minStockLevel') }}
+            </small>
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <button
+            pButton
+            pRipple
+            type="button"
+            label="Cancel"
+            icon="pi pi-times"
+            class="p-button-text p-button-secondary"
+            (click)="onCancel()">
+          </button>
+          <button
+            pButton
+            pRipple
+            type="submit"
+            [label]="isEditMode ? 'Update Stock' : 'Create Stock'"
+            icon="pi pi-check"
+            class="p-button-primary"
+            [loading]="(loading$ | async) || false"
+            [disabled]="boxStockForm.invalid || (loading$ | async)">
+          </button>
+        </div>
+      </form>
+    </p-card>
+  </div>
+</div>

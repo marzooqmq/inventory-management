@@ -1,0 +1,82 @@
+<div class="material-stock-form-container">
+  <app-page-header
+    [title]="isEditMode ? 'Edit Material Stock' : 'Add Material Stock'"
+    [subtitle]="isEditMode ? 'Update raw material stock quantity' : 'Add new material stock entry'"
+    icon="warehouse">
+  </app-page-header>
+
+  <div class="form-card">
+    <p-card>
+      <form [formGroup]="materialStockForm" (ngSubmit)="onSubmit()">
+        <div class="form-grid">
+          <!-- Material -->
+          <div class="form-field full-width">
+            <label for="materialId" class="field-label">
+              Raw Material <span class="required">*</span>
+            </label>
+            <p-dropdown
+              id="materialId"
+              formControlName="materialId"
+              [options]="(rawMaterials$ | async) || []"
+              optionLabel="name"
+              optionValue="id"
+              placeholder="Select raw material"
+              [showClear]="true"
+              [filter]="true"
+              filterBy="name"
+              [class.invalid]="isFieldInvalid('materialId')">
+            </p-dropdown>
+            <small class="field-help">Select the material to track stock for</small>
+            <small class="error-message" *ngIf="isFieldInvalid('materialId')">
+              {{ getErrorMessage('materialId') }}
+            </small>
+          </div>
+
+          <!-- Quantity -->
+          <div class="form-field full-width">
+            <label for="quantity" class="field-label">
+              Quantity <span class="required">*</span>
+            </label>
+            <p-inputNumber
+              id="quantity"
+              formControlName="quantity"
+              [min]="0"
+              [minFractionDigits]="2"
+              [maxFractionDigits]="2"
+              [showButtons]="true"
+              buttonLayout="stacked"
+              [class.invalid]="isFieldInvalid('quantity')">
+            </p-inputNumber>
+            <small class="field-help">Enter the current stock quantity</small>
+            <small class="error-message" *ngIf="isFieldInvalid('quantity')">
+              {{ getErrorMessage('quantity') }}
+            </small>
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <button
+            pButton
+            pRipple
+            type="button"
+            label="Cancel"
+            icon="pi pi-times"
+            class="p-button-text p-button-secondary"
+            (click)="onCancel()">
+          </button>
+          <button
+            pButton
+            pRipple
+            type="submit"
+            [label]="isEditMode ? 'Update Stock' : 'Create Stock'"
+            icon="pi pi-check"
+            class="p-button-primary"
+            [loading]="(loading$ | async) || false"
+            [disabled]="materialStockForm.invalid || (loading$ | async)">
+          </button>
+        </div>
+      </form>
+    </p-card>
+  </div>
+</div>

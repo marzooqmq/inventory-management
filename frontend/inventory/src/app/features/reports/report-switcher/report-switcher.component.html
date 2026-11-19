@@ -1,0 +1,13 @@
+<nav class="report-switcher" aria-label="Report navigation">
+  <span class="switcher-label">Reports</span>
+  <div class="switcher-links">
+    <a
+      *ngFor="let report of visibleReports"
+      [routerLink]="report.route"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+      [attr.aria-current]="isActive(report.route) ? 'page' : null">
+      {{ report.label }}
+    </a>
+  </div>
+</nav>

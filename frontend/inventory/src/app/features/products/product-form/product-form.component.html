@@ -1,0 +1,156 @@
+<div class="product-form-container">
+  <app-page-header
+    [title]="isEditMode ? 'Edit Product' : 'Add New Product'"
+    [subtitle]="isEditMode ? 'Update product information' : 'Create a new product'"
+    icon="shopping-bag">
+  </app-page-header>
+
+  <div class="form-card">
+    <p-card>
+      <form [formGroup]="productForm" (ngSubmit)="onSubmit()">
+        <div class="form-grid">
+          <!-- Product Name -->
+          <div class="form-field full-width">
+            <label for="name" class="field-label">
+              Product Name <span class="required">*</span>
+            </label>
+            <input
+              id="name"
+              type="text"
+              pInputText
+              formControlName="name"
+              placeholder="Enter product name"
+              [class.invalid]="isFieldInvalid('name')" />
+            <small class="error-message" *ngIf="isFieldInvalid('name')">
+              {{ getErrorMessage('name') }}
+            </small>
+          </div>
+
+          <!-- Category -->
+          <div class="form-field">
+            <label for="category" class="field-label">
+              Category <span class="required">*</span>
+            </label>
+            <p-dropdown
+              id="category"
+              formControlName="category"
+              [options]="categories"
+              placeholder="Select category"
+              optionLabel="label"
+              optionValue="value"
+              [showClear]="true"
+              [class.invalid]="isFieldInvalid('category')">
+            </p-dropdown>
+            <small class="error-message" *ngIf="isFieldInvalid('category')">
+              {{ getErrorMessage('category') }}
+            </small>
+          </div>
+
+          <!-- Size -->
+          <div class="form-field">
+            <label for="size" class="field-label">
+              Size <span class="required">*</span>
+            </label>
+            <p-dropdown
+              id="size"
+              formControlName="size"
+              [options]="sizes"
+              placeholder="Select size"
+              optionLabel="label"
+              optionValue="value"
+              [showClear]="true"
+              [class.invalid]="isFieldInvalid('size')">
+            </p-dropdown>
+            <small class="error-message" *ngIf="isFieldInvalid('size')">
+              {{ getErrorMessage('size') }}
+            </small>
+          </div>
+
+          <!-- Pads Per Box -->
+          <div class="form-field">
+            <label for="padsPerBox" class="field-label">
+              Pads Per Box <span class="required">*</span>
+            </label>
+            <p-inputNumber
+              id="padsPerBox"
+              formControlName="padsPerBox"
+              [min]="1"
+              [showButtons]="true"
+              placeholder="Enter quantity"
+              [class.invalid]="isFieldInvalid('padsPerBox')">
+            </p-inputNumber>
+            <small class="error-message" *ngIf="isFieldInvalid('padsPerBox')">
+              {{ getErrorMessage('padsPerBox') }}
+            </small>
+          </div>
+
+          <!-- MRP -->
+          <div class="form-field">
+            <label for="mrp" class="field-label">
+                MRP (₹) <span class="required">*</span>
+            </label>
+            <p-inputNumber
+              id="mrp"
+              formControlName="mrp"
+              mode="currency"
+              currency="INR"
+              locale="en-IN"
+              [min]="0"
+              placeholder="Enter MRP"
+              [class.invalid]="isFieldInvalid('mrp')">
+            </p-inputNumber>
+            <small class="error-message" *ngIf="isFieldInvalid('mrp')">
+              {{ getErrorMessage('mrp') }}
+            </small>
+          </div>
+
+          <!-- Description -->
+          <div class="form-field full-width">
+            <label for="description" class="field-label">Description</label>
+            <textarea
+              id="description"
+              pInputTextarea
+              formControlName="description"
+              rows="4"
+              placeholder="Enter product description"
+              [autoResize]="true">
+            </textarea>
+          </div>
+
+          <!-- Active Status -->
+          <div class="form-field checkbox-field full-width">
+            <p-checkbox
+              formControlName="active"
+              [binary]="true"
+              inputId="active"
+              label="Product is active">
+            </p-checkbox>
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <button
+            pButton
+            pRipple
+            type="button"
+            label="Cancel"
+            icon="pi pi-times"
+            class="p-button-text p-button-secondary"
+            (click)="onCancel()">
+          </button>
+          <button
+            pButton
+            pRipple
+            type="submit"
+            [label]="isEditMode ? 'Update Product' : 'Create Product'"
+            icon="pi pi-check"
+            class="p-button-primary"
+            [loading]="(loading$ | async) ?? false"
+            [disabled]="productForm.invalid">
+          </button>
+        </div>
+      </form>
+    </p-card>
+  </div>
+</div>

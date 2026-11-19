@@ -1,0 +1,519 @@
+.cost-approval-container {
+	padding: 1.5rem;
+	background: #fafbfc;
+	min-height: 100vh;
+	max-width: 100%;
+	overflow-x: hidden
+}
+
+/* Back Button - Match Add Product Button Style */
+::ng-deep .back-btn {
+	padding: 0.625rem 1.25rem;
+	font-weight: 600;
+	font-size: 0.875rem;
+	background: #0891b2;
+	border: none;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+	transition: all 0.2s ease;
+	color: white;
+}
+
+::ng-deep .back-btn:hover {
+	background: #0e7490;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.table-wrapper {
+	background: white;
+	border-radius: 12px;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, .08);
+	margin: 1.5rem 0;
+	overflow: hidden;
+	position: relative
+}
+
+.modern-table-container {
+	overflow-x: auto;
+	background: white
+}
+
+.modern-table {
+	width: 100%;
+	border-collapse: separate;
+	border-spacing: 0;
+	table-layout: auto
+}
+
+.modern-table thead {
+	background: #f9fafb;
+	position: sticky;
+	top: 0;
+	z-index: 10
+}
+
+.modern-table thead tr {
+	border-bottom: 1px solid #e5e7eb
+}
+
+.modern-table th {
+	padding: 1rem 1.5rem;
+	text-align: left;
+	font-size: .75rem;
+	font-weight: 600;
+	color: #6b7280;
+	text-transform: uppercase;
+	letter-spacing: .05em;
+	white-space: nowrap
+}
+
+.modern-table th:first-child {
+	padding-left: 2rem
+}
+
+.modern-table th:last-child {
+	padding-right: 2rem
+}
+
+.col-sno {
+	width: 70px
+}
+
+.col-product {
+	min-width: 220px
+}
+
+.col-category {
+	width: 140px
+}
+
+.col-current {
+	width: 140px
+}
+
+.col-new {
+	width: 140px
+}
+
+.col-calculated {
+	width: 180px
+}
+
+.col-change {
+	width: 120px
+}
+
+.col-actions {
+	width: 100px;
+	text-align: center
+}
+
+.modern-table tbody {
+	background: white
+}
+
+.table-row {
+	border-bottom: 1px solid #f3f4f6;
+	transition: all .15s ease
+}
+
+.table-row:hover {
+	background: #fafbfc;
+	box-shadow: inset 0 0 0 1px #f3f4f6
+}
+
+.table-row:last-child {
+	border-bottom: none
+}
+
+.modern-table td {
+	padding: 1.25rem 1.5rem;
+	vertical-align: middle
+}
+
+.modern-table td:first-child {
+	padding-left: 2rem
+}
+
+.modern-table td:last-child {
+	padding-right: 2rem
+}
+
+.cell-sno {
+	font-weight: 500;
+	color: #9ca3af;
+	font-size: .875rem
+}
+
+.product-text {
+	font-weight: 600;
+	font-size: .9375rem;
+	color: #111827;
+	line-height: 1.4
+}
+
+.product-size {
+	font-size: .75rem;
+	color: #6b7280;
+	margin-top: .25rem
+}
+
+/* Category Tags - Override PrimeNG styles to match product list */
+::ng-deep .p-tag {
+	padding: 6px 12px;
+	font-size: 11px;
+	font-weight: 600;
+	border-radius: 6px;
+	text-transform: uppercase;
+	letter-spacing: 0.3px
+}
+
+::ng-deep .p-tag.p-tag-info {
+	background: #dbeafe;
+	color: #2563eb
+}
+
+::ng-deep .p-tag.p-tag-success {
+	background: #d1fae5;
+	color: #059669
+}
+
+::ng-deep .p-tag.p-tag-warning {
+	background: #fef3c7;
+	color: #d97706
+}
+
+.cost-value {
+	font-size: .9375rem;
+	font-weight: 600;
+	color: #475569
+}
+
+.cost-value.new-cost {
+	color: #0891b2;
+	font-weight: 700
+}
+
+.date-text {
+	font-size: .8125rem;
+	color: #6b7280;
+	font-weight: 500
+}
+
+.change-badge {
+	display: inline-flex;
+	align-items: center;
+	padding: .375rem .875rem;
+	border-radius: 6px;
+	font-size: .8125rem;
+	font-weight: 600
+}
+
+.change-badge.change-increase {
+	background: #fee2e2;
+	color: #dc2626
+}
+
+.change-badge.change-decrease {
+	background: #dcfce7;
+	color: #16a34a
+}
+
+.empty-row {
+	background: white
+}
+
+.empty-state {
+	text-align: center;
+	padding: 4rem 2rem
+}
+
+.empty-icon {
+	width: 80px;
+	height: 80px;
+	margin: 0 auto 1.5rem;
+	background: linear-gradient(135deg, #ecfeff 0%, #f0f9ff 100%);
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center
+}
+
+.empty-icon i {
+	font-size: 2.5rem;
+	color: #0891b2
+}
+
+.empty-title {
+	font-size: 1.25rem;
+	font-weight: 600;
+	color: #111827;
+	margin: 0 0 .5rem 0
+}
+
+.empty-text {
+	color: #6b7280;
+	font-size: .9375rem;
+	margin: 0
+}
+
+.loading-overlay {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: rgba(255, 255, 255, .9);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 100
+}
+
+.loading-spinner {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 1rem
+}
+
+.loading-spinner i {
+	font-size: 2rem;
+	color: #0891b2
+}
+
+.loading-spinner span {
+	color: #6b7280;
+	font-size: .9375rem
+}
+
+:host ::ng-deep .p-button-secondary {
+	color: #64748b;
+	font-weight: 600
+}
+
+:host ::ng-deep .p-button-secondary:hover {
+	background: #f1f5f9;
+	color: #475569
+}
+
+:host ::ng-deep .btn-approve-action {
+	background: #16a34a;
+	border: none;
+	color: white;
+	font-weight: 600;
+	padding: .5rem 1.25rem;
+	transition: all .2s ease
+}
+
+:host ::ng-deep .btn-approve-action:hover {
+	background: #15803d;
+	transform: translateY(-1px);
+	box-shadow: 0 4px 12px rgba(22, 163, 74, .3)
+}
+
+:host ::ng-deep .btn-approve-action .p-button-icon {
+	font-size: .875rem
+}
+
+/* Dialog Styling */
+:host ::ng-deep .approval-dialog .p-dialog {
+	border-radius: 8px;
+	box-shadow: 0 10px 40px rgba(0, 0, 0, .1)
+}
+
+:host ::ng-deep .approval-dialog .p-dialog-header {
+	padding: 1.25rem 1.5rem;
+	background: #ffffff;
+	border-bottom: 1px solid #e5e7eb
+}
+
+:host ::ng-deep .approval-dialog .p-dialog-header .p-dialog-title {
+	font-size: 1.125rem;
+	font-weight: 600;
+	color: #111827
+}
+
+:host ::ng-deep .approval-dialog .p-dialog-content {
+	padding: 0
+}
+
+:host ::ng-deep .approval-dialog .p-dialog-footer {
+	padding: 1rem 1.5rem;
+	background: #ffffff;
+	border-top: 1px solid #e5e7eb;
+	display: flex;
+	justify-content: flex-end;
+	gap: .75rem
+}
+
+.dialog-content {
+	padding: 1.5rem
+}
+
+.product-section,
+.cost-section,
+.date-section {
+	margin-bottom: 1.5rem
+}
+
+.date-section {
+	margin-bottom: 0
+}
+
+.section-label {
+	display: block;
+	font-size: .8125rem;
+	font-weight: 600;
+	color: #374151;
+	text-transform: uppercase;
+	letter-spacing: .025em;
+	margin-bottom: .75rem
+}
+
+.product-info {
+	padding: .875rem 1rem;
+	background: #f9fafb;
+	border: 1px solid #e5e7eb;
+	border-radius: 6px
+}
+
+.product-name {
+	font-size: 1rem;
+	font-weight: 600;
+	color: #111827;
+	margin-bottom: .25rem
+}
+
+.product-details {
+	font-size: .875rem;
+	color: #6b7280
+}
+
+.cost-comparison {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+	padding: 1rem;
+	background: #f9fafb;
+	border: 1px solid #e5e7eb;
+	border-radius: 6px
+}
+
+.cost-box {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	gap: .5rem;
+	padding: .75rem;
+	background: white;
+	border: 1px solid #e5e7eb;
+	border-radius: 4px
+}
+
+.cost-label {
+	font-size: .75rem;
+	color: #6b7280;
+	font-weight: 500;
+	text-transform: uppercase;
+	letter-spacing: .025em
+}
+
+.cost-value {
+	font-size: 1.25rem;
+	font-weight: 700;
+	line-height: 1
+}
+
+.cost-value.current {
+	color: #374151
+}
+
+.cost-value.new {
+	color: #059669
+}
+
+.cost-arrow {
+	color: #9ca3af;
+	font-size: 1.25rem;
+	flex-shrink: 0
+}
+
+.required {
+	color: #dc2626
+}
+
+.help-text {
+	display: block;
+	color: #6b7280;
+	font-size: .8125rem;
+	margin-top: .5rem
+}
+
+:host ::ng-deep .approval-dialog .p-calendar {
+	width: 100%
+}
+
+:host ::ng-deep .approval-dialog .p-inputtext {
+	width: 100%;
+	padding: .625rem .875rem;
+	border: 1px solid #d1d5db;
+	border-radius: 6px;
+	font-size: .875rem;
+	transition: all .15s ease
+}
+
+:host ::ng-deep .approval-dialog .p-inputtext:hover,
+:host ::ng-deep .approval-dialog .p-inputtext:focus {
+	border-color: #0891b2;
+	box-shadow: 0 0 0 3px rgba(8, 145, 178, .1)
+}
+
+:host ::ng-deep .approval-dialog .p-calendar .p-datepicker-trigger {
+	width: 2.5rem !important;
+	background: #0891b2 !important;
+	color: white !important;
+	border: none !important;
+	border-radius: 0 6px 6px 0 !important;
+	transition: all 0.2s ease !important;
+}
+
+:host ::ng-deep .approval-dialog .p-calendar .p-datepicker-trigger:hover {
+	background: #0e7490 !important;
+	transform: translateY(-1px);
+	box-shadow: 0 2px 8px rgba(8, 145, 178, 0.3) !important;
+}
+
+:host ::ng-deep .approval-dialog .p-calendar .p-inputtext {
+	padding-right: 3rem !important;
+	border-radius: 6px 0 0 6px !important;
+}
+
+:host ::ng-deep .approval-dialog .p-calendar:not(.p-disabled).p-focus .p-inputtext {
+	border-right: 1px solid #0891b2 !important;
+}
+
+:host ::ng-deep .approval-dialog .p-button {
+	padding: .625rem 1.25rem;
+	font-size: .875rem;
+	font-weight: 500;
+	border-radius: 6px
+}
+
+:host ::ng-deep .approval-dialog .p-button-success {
+	background: #059669;
+	border-color: #059669
+}
+
+:host ::ng-deep .approval-dialog .p-button-success:hover {
+	background: #047857;
+	border-color: #047857
+}
+
+:host ::ng-deep .approval-dialog .p-button-text {
+	color: #6b7280
+}
+
+:host ::ng-deep .approval-dialog .p-button-text:hover {
+	background: #f3f4f6;
+	color: #374151
+}

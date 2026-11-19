@@ -1,0 +1,156 @@
+<div class="raw-material-form-container">
+  <app-page-header
+    [title]="isEditMode ? 'Edit Raw Material' : 'Add New Raw Material'"
+    [subtitle]="isEditMode ? 'Update raw material details' : 'Create a new raw material'"
+    icon="database">
+  </app-page-header>
+
+  <div class="form-card">
+    <p-card>
+      <form [formGroup]="rawMaterialForm" (ngSubmit)="onSubmit()">
+        <div class="form-grid">
+          <!-- Name -->
+          <div class="form-field full-width">
+            <label for="name" class="field-label">
+              Name <span class="required">*</span>
+            </label>
+            <input
+              id="name"
+              type="text"
+              pInputText
+              formControlName="name"
+              placeholder="Enter raw material name"
+              [class.invalid]="isFieldInvalid('name')" />
+            <small class="error-message" *ngIf="isFieldInvalid('name')">
+              {{ getErrorMessage('name') }}
+            </small>
+          </div>
+
+          <!-- Cost Per Unit -->
+          <div class="form-field">
+            <label for="costPerUnit" class="field-label">
+              Cost Per Unit (₹) <span class="required">*</span>
+            </label>
+            <p-inputNumber
+              id="costPerUnit"
+              formControlName="costPerUnit"
+              mode="currency"
+              currency="INR"
+              locale="en-IN"
+              [min]="0"
+              placeholder="Enter cost per unit"
+              [class.invalid]="isFieldInvalid('costPerUnit')">
+            </p-inputNumber>
+            <small class="error-message" *ngIf="isFieldInvalid('costPerUnit')">
+              {{ getErrorMessage('costPerUnit') }}
+            </small>
+          </div>
+
+          <!-- Purchase Unit -->
+          <div class="form-field">
+            <label for="purchaseUnit" class="field-label">
+              Purchase Unit <span class="required">*</span>
+            </label>
+            <input
+              id="purchaseUnit"
+              type="text"
+              pInputText
+              formControlName="purchaseUnit"
+              placeholder="e.g., kg, liters, units"
+              [class.invalid]="isFieldInvalid('purchaseUnit')" />
+            <small class="error-message" *ngIf="isFieldInvalid('purchaseUnit')">
+              {{ getErrorMessage('purchaseUnit') }}
+            </small>
+          </div>
+
+          <!-- Consumption Unit -->
+          <div class="form-field">
+            <label for="consumptionUnit" class="field-label">
+              Consumption Unit <span class="required">*</span>
+            </label>
+            <input
+              id="consumptionUnit"
+              type="text"
+              pInputText
+              formControlName="consumptionUnit"
+              placeholder="e.g., pcs, grams, ml"
+              [class.invalid]="isFieldInvalid('consumptionUnit')" />
+            <small class="error-message" *ngIf="isFieldInvalid('consumptionUnit')">
+              {{ getErrorMessage('consumptionUnit') }}
+            </small>
+          </div>
+
+          <!-- Conversion Factor -->
+          <div class="form-field">
+            <label for="conversionFactor" class="field-label">
+              Conversion Factor <span class="required">*</span>
+            </label>
+            <p-inputNumber
+              id="conversionFactor"
+              formControlName="conversionFactor"
+              [min]="0"
+              [showButtons]="true"
+              placeholder="Enter conversion factor"
+              [class.invalid]="isFieldInvalid('conversionFactor')">
+            </p-inputNumber>
+            <small class="field-help">How many consumption units per purchase unit</small>
+            <small class="error-message" *ngIf="isFieldInvalid('conversionFactor')">
+              {{ getErrorMessage('conversionFactor') }}
+            </small>
+          </div>
+
+          <!-- Minimum Stock Level -->
+          <div class="form-field">
+            <label for="minStockLevel" class="field-label">
+              Minimum Stock Level <span class="required">*</span>
+            </label>
+            <p-inputNumber
+              id="minStockLevel"
+              formControlName="minStockLevel"
+              [min]="0"
+              [showButtons]="true"
+              placeholder="Enter minimum stock level"
+              [class.invalid]="isFieldInvalid('minStockLevel')">
+            </p-inputNumber>
+            <small class="error-message" *ngIf="isFieldInvalid('minStockLevel')">
+              {{ getErrorMessage('minStockLevel') }}
+            </small>
+          </div>
+
+          <!-- Active Status -->
+          <div class="form-field full-width checkbox-field">
+            <p-checkbox
+              id="active"
+              formControlName="active"
+              [binary]="true"
+              label="Active">
+            </p-checkbox>
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <button
+            pButton
+            pRipple
+            type="button"
+            label="Cancel"
+            icon="pi pi-times"
+            class="p-button-text p-button-secondary"
+            (click)="onCancel()">
+          </button>
+          <button
+            pButton
+            pRipple
+            type="submit"
+            [label]="isEditMode ? 'Update Raw Material' : 'Create Raw Material'"
+            icon="pi pi-check"
+            class="p-button-primary"
+            [loading]="(loading$ | async) ?? false"
+            [disabled]="rawMaterialForm.invalid">
+          </button>
+        </div>
+      </form>
+    </p-card>
+  </div>
+</div>

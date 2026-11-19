@@ -1,0 +1,438 @@
+.production-order-form-container {
+  padding: 0;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.form-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  margin-top: 0;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+  padding: 0.5rem 0;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-field.full-width {
+  grid-column: 1 / -1;
+}
+
+.field-label {
+  font-weight: 600;
+  color: #1e293b;
+  font-size: 0.875rem;
+  letter-spacing: 0.01em;
+}
+
+.required {
+  color: #ef4444;
+}
+
+.error-message {
+  color: #ef4444;
+  font-size: 0.8125rem;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+/* Info Box */
+.info-box {
+  display: flex;
+  gap: 1rem;
+  padding: 1.25rem;
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  border: 1px solid #bfdbfe;
+  border-left: 4px solid #3b82f6;
+  border-radius: 10px;
+  margin-top: 1.5rem;
+}
+
+.info-box i {
+  color: #3b82f6;
+  font-size: 1.5rem;
+  margin-top: 0.125rem;
+  flex-shrink: 0;
+}
+
+.info-content {
+  flex: 1;
+}
+
+.info-title {
+  display: block;
+  color: #1e40af;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.01em;
+}
+
+.info-text {
+  margin: 0;
+  color: #475569;
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+.info-text strong {
+  color: #1e40af;
+  font-weight: 600;
+}
+
+/* Form Actions */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.875rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+  margin-top: 1.5rem;
+}
+
+/* Input Customization */
+:host ::ng-deep {
+  .p-card .p-card-body {
+    padding: 2rem;
+  }
+
+  .p-card .p-card-content {
+    padding: 0;
+  }
+
+  /* Dropdown Styling */
+  input.p-inputtext,
+  .p-dropdown,
+  .p-inputnumber,
+  textarea.p-inputtextarea {
+    width: 100%;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    padding: 0.625rem 0.875rem;
+    font-size: 0.875rem;
+    transition: all 0.15s ease;
+  }
+
+  input.p-inputtext:focus,
+  .p-dropdown:not(.p-disabled):hover,
+  .p-dropdown:not(.p-disabled).p-focus,
+  .p-inputnumber:not(.p-disabled):hover .p-inputtext,
+  .p-inputnumber:not(.p-disabled).p-inputnumber-focus .p-inputtext,
+  textarea.p-inputtextarea:focus {
+    border-color: #0891b2;
+    box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.1);
+  }
+
+  input.invalid,
+  .p-dropdown.invalid,
+  .p-inputnumber.invalid .p-inputtext {
+    border-color: #ef4444;
+  }
+
+  input.invalid:focus,
+  .p-dropdown.invalid:focus,
+  .p-inputnumber.invalid .p-inputtext:focus {
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+  }
+
+  .p-dropdown-panel {
+    border-radius: 6px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
+    margin-top: 0.25rem;
+  }
+
+  .p-dropdown-item {
+    padding: 0.625rem 1rem;
+    font-size: 0.875rem;
+    color: #374151;
+    transition: all 0.1s ease;
+  }
+
+  .p-dropdown-item:hover {
+    background: #f0f9ff;
+    color: #0891b2;
+  }
+
+  .p-dropdown-item.p-highlight {
+    background: #ecfeff;
+    color: #0891b2;
+  }
+
+  /* Custom Clear Icon */
+  .p-dropdown-clear-icon {
+    color: #9ca3af;
+    font-size: 0.875rem;
+    transition: all 0.15s ease;
+  }
+
+  .p-dropdown-clear-icon:hover {
+    color: #ef4444;
+  }
+
+  .p-dropdown .p-dropdown-trigger {
+    color: #6b7280;
+  }
+
+  .p-dropdown:not(.p-disabled).p-focus .p-dropdown-trigger {
+    color: #0891b2;
+  }
+
+  .p-dropdown:not(.p-disabled).p-focus .p-dropdown-trigger {
+    color: #0891b2;
+  }
+
+  .p-dropdown-clear-icon {
+    color: #9ca3af;
+    font-size: 0.875rem;
+    transition: all 0.15s ease;
+  }
+
+  .p-dropdown-clear-icon:hover {
+    color: #ef4444;
+  }
+
+  .p-dropdown-panel {
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+    border: 1px solid #e5e7eb;
+    margin-top: 0.25rem;
+  }
+
+  .p-dropdown-items {
+    padding: 0.5rem 0;
+  }
+
+  .p-dropdown-item {
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    color: #374151;
+    transition: all 0.15s ease;
+  }
+
+  .p-dropdown-item:hover {
+    background: #f0f9ff;
+    color: #0891b2;
+  }
+
+  .p-dropdown-item.p-highlight {
+    background: #ecfeff;
+    color: #0891b2;
+  }
+
+  /* Input Number Styling */
+  .p-inputnumber {
+    width: 100%;
+  }
+
+  .p-inputnumber .p-inputtext {
+    width: 100%;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+  }
+
+  .p-inputnumber:not(.p-disabled):hover .p-inputtext {
+    border-color: #0891b2;
+  }
+
+  .p-inputnumber:not(.p-disabled).p-inputnumber-focus .p-inputtext {
+    border-color: #0891b2;
+    box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.1);
+  }
+
+  .p-inputnumber.invalid .p-inputtext {
+    border-color: #ef4444;
+  }
+
+  .p-inputnumber.invalid .p-inputtext:focus {
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+  }
+
+  .p-inputnumber-button {
+    background: #f9fafb;
+    border: 1px solid #d1d5db;
+    color: #6b7280;
+    width: 2.5rem;
+    transition: all 0.2s ease;
+  }
+
+  .p-inputnumber-button:hover:not(:disabled) {
+    background: #0891b2;
+    border-color: #0891b2;
+    color: white;
+  }
+
+  .p-inputnumber-button-group .p-inputnumber-button {
+    border-radius: 0;
+  }
+
+  .p-inputnumber-button-group .p-inputnumber-button:first-child {
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+  }
+
+  .p-inputnumber-button-group .p-inputnumber-button:last-child {
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+  }
+
+  /* Calendar Styling */
+  .p-calendar {
+    width: 100%;
+  }
+
+  .p-calendar .p-inputtext {
+    width: 100%;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+  }
+
+  .p-calendar:not(.p-disabled):hover .p-inputtext {
+    border-color: #0891b2;
+  }
+
+  .p-calendar:not(.p-disabled).p-focus .p-inputtext {
+    border-color: #0891b2;
+    box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.1);
+  }
+
+  .p-calendar.invalid .p-inputtext {
+    border-color: #ef4444;
+  }
+
+  .p-calendar.invalid .p-inputtext:focus {
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+  }
+
+  .p-datepicker-trigger {
+    width: 2.5rem !important;
+    background: #0891b2 !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 0 8px 8px 0 !important;
+    transition: all 0.2s ease !important;
+  }
+
+  .p-datepicker-trigger:hover {
+    background: #0e7490 !important;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(8, 145, 178, 0.3) !important;
+  }
+  
+  .p-calendar .p-inputtext {
+    padding-right: 3rem !important;
+    border-radius: 8px 0 0 8px !important;
+  }
+  
+  .p-calendar:not(.p-disabled).p-focus .p-inputtext {
+    border-right: 1px solid #0891b2 !important;
+  }
+
+  /* Button Styling */
+  .p-button {
+    padding: 0.75rem 1.75rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    letter-spacing: 0.02em;
+  }
+
+  .p-button-primary {
+    background: #0891b2;
+    border: 1px solid #0891b2;
+    color: white;
+  }
+
+  .p-button-primary:hover:not(:disabled) {
+    background: #0e7490;
+    border-color: #0e7490;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(8, 145, 178, 0.3);
+  }
+
+  .p-button-primary:active {
+    transform: translateY(0);
+  }
+
+  .p-button-secondary {
+    background: white;
+    border: 1px solid #d1d5db;
+    color: #64748b;
+  }
+
+  .p-button-secondary:hover:not(:disabled) {
+    background: #f9fafb;
+    border-color: #94a3b8;
+    color: #475569;
+  }
+
+  .p-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .production-order-form-container {
+    padding: 0;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .form-field.full-width {
+    grid-column: 1;
+  }
+
+  .info-box {
+    padding: 1rem;
+  }
+
+  .info-box i {
+    font-size: 1.25rem;
+  }
+
+  .info-title {
+    font-size: 0.875rem;
+  }
+
+  .info-text {
+    font-size: 0.8125rem;
+  }
+
+  .form-actions {
+    flex-direction: column-reverse;
+  }
+
+  .form-actions button {
+    width: 100%;
+  }
+
+  :host ::ng-deep .p-card .p-card-body {
+    padding: 1.5rem;
+  }
+
+  :host ::ng-deep .p-button {
+    padding: 0.75rem 1.25rem;
+  }
+}

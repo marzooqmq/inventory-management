@@ -1,0 +1,100 @@
+<div class="user-list-container">
+  <app-page-header
+    title="Users"
+    subtitle="Manage system users and access levels"
+    icon="users"
+    [showAddButton]="true"
+    addButtonLabel="Add User"
+    (onAdd)="onAddUser()">
+    <div actions class="search-wrapper">
+      <i class="pi pi-search search-icon"></i>
+      <input
+        type="text"
+        [(ngModel)]="searchQuery"
+        (input)="onSearch()"
+        placeholder="Search users..."
+        class="modern-search" />
+    </div>
+  </app-page-header>
+
+  <!-- Users Table -->
+  <div class="table-wrapper">
+    <div class="modern-table-container">
+    <table class="modern-table">
+      <thead>
+        <tr>
+          <th class="cell-index">S.NO.</th>
+          <th class="cell-user">USER</th>
+          <th class="cell-role">ROLE</th>
+          <th class="cell-status">STATUS</th>
+          <th class="cell-created">CREATED</th>
+          <th class="cell-actions">ACTIONS</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of filteredUsers; let i = index" class="table-row">
+          <td class="cell-index">
+            <span class="sno-text">{{ i + 1 }}</span>
+          </td>
+
+          <td class="cell-user">
+            <div class="user-info">
+              <div class="user-name">{{ user.username }}</div>
+              <div class="user-id" *ngIf="user.id">
+                ID: #{{ user.id }}
+              </div>
+            </div>
+          </td>
+
+          <td class="cell-role">
+            <p-tag
+              [value]="getRoleDisplay(user.role)"
+              [severity]="getRoleSeverity(user.role)">
+            </p-tag>
+          </td>
+
+          <td class="cell-status">
+            <span class="status-indicator" [class.active]="user.active" [class.inactive]="!user.active">
+              <span class="status-dot"></span>
+              <span class="status-text">{{ user.active ? 'Active' : 'Inactive' }}</span>
+            </span>
+          </td>
+
+          <td class="cell-created">
+            <div class="date-info">
+              <div class="date-text">{{ formatDate(user.createdAt) }}</div>
+            </div>
+          </td>
+
+          <td class="cell-actions">
+            <div class="action-group">
+              <button class="btn-action btn-edit" (click)="onEditUser(user.id)"
+                      pTooltip="Edit" tooltipPosition="top">
+                <i class="pi pi-pencil"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+
+        <!-- Empty State -->
+        <tr *ngIf="filteredUsers.length === 0">
+          <td colspan="6" class="empty-state">
+            <div class="empty-content">
+              <i class="pi pi-users empty-icon"></i>
+              <p class="empty-text">No users found</p>
+              <button pButton label="Add User" icon="pi pi-plus"
+                      class="p-button-primary" (click)="onAddUser()"></button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" *ngIf="loading">
+    <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
+  </div>
+</div>
+
+<app-confirm-dialog></app-confirm-dialog>

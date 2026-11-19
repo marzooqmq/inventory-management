@@ -1,0 +1,349 @@
+<p-toast></p-toast>
+
+<!-- Loading State -->
+<div *ngIf="loading && !order" class="loading-state">
+  <div class="spinner-wrapper">
+    <i class="pi pi-spin pi-spinner"></i>
+    <p>Loading production details...</p>
+  </div>
+</div>
+
+<!-- Not Found State -->
+<div *ngIf="!loading && !order" class="error-state">
+  <div class="error-content">
+    <i class="pi pi-exclamation-triangle"></i>
+    <h2>Production Order Not Found</h2>
+    <p>The requested order could not be found in the system.</p>
+    <button class="action-btn" (click)="goBack()">
+      <i class="pi pi-arrow-left"></i>
+      <span>Back to Production Orders</span>
+    </button>
+  </div>
+</div>
+
+<!-- Main Content -->
+<div *ngIf="order" class="production-details">
+  
+  <!-- Page Header -->
+  <app-page-header
+    [title]="'Order #' + order.id + ' - ' + order.productName"
+    subtitle=""
+    icon="sitemap"
+    [showAddButton]="false">
+    <div actions class="header-actions">
+      <button class="back-button" (click)="goBack()">
+        <i class="pi pi-arrow-left"></i>
+        <span>Back to Orders</span>
+      </button>
+      <div class="header-meta">
+        <span class="meta-badge">
+          <i class="pi pi-calendar"></i>
+          {{ order.startDate | date: 'MMM d, yyyy' }}
+        </span>
+        <span class="meta-badge">
+          <i class="pi pi-box"></i>
+          {{ order.quantity | number:'1.0-0' }} units
+        </span>
+      </div>
+      <span class="status-badge" [ngClass]="getStatusClass(order.status)">
+        {{ getStatusLabel(order.status) }}
+      </span>
+    </div>
+  </app-page-header>
+
+  <!-- Progress Overview Card -->
+  <div class="progress-overview-card">
+    <div class="card-header">
+      <h2>Production Progress</h2>
+      <div class="progress-stats">
+        <span class="stat-highlight">{{ getProgressPercentage() }}%</span>
+        <span class="stat-label">Complete</span>
+      </div>
+    </div>
+    <div class="progress-visual">
+      <div class="progress-bar">
+        <div class="progress-bar-fill" [style.width.%]="getProgressPercentage()"></div>
+      </div>
+      <div class="stages-timeline">
+        <div *ngFor="let stage of stages; let i = index" 
+             class="timeline-stage"
+             [class.completed]="stageProgress.get(stage)?.completed"
+             [class.active]="stageProgress.get(stage)?.inProgress">
+          <div class="stage-marker">
+            <i class="pi pi-check" *ngIf="stageProgress.get(stage)?.completed"></i>
+            <span *ngIf="!stageProgress.get(stage)?.completed">{{ i + 1 }}</span>
+          </div>
+          <span class="stage-name">{{ getStageLabel(stage) }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content Grid -->
+  <div class="content-layout">
+    
+    <!-- Production Stages Section -->
+    <div class="section stages-section">
+      <div class="section-header">
+        <h2><i class="pi pi-sitemap"></i> Production Stages</h2>
+      </div>
+
+      <div *ngIf="stageProgress.size === 0" class="empty-state">
+        <i class="pi pi-inbox"></i>
+        <h3>No Production Started</h3>
+        <p>Begin production by executing the first stage</p>
+      </div>
+
+      <div *ngIf="stageProgress.size > 0" class="stages-grid-row">
+        <div *ngFor="let stage of stages; let i = index" 
+             class="stage-card"
+             [class.stage-completed]="stageProgress.get(stage)?.completed"
+             [class.stage-active]="stageProgress.get(stage)?.inProgress"
+             [class.stage-pending]="!stageProgress.get(stage)?.inProgress && !stageProgress.get(stage)?.completed">
+          
+          <div class="stage-card-header">
+            <div class="stage-badge" 
+                 [class.badge-completed]="stageProgress.get(stage)?.completed"
+                 [class.badge-active]="stageProgress.get(stage)?.inProgress">
+              <i class="pi pi-check" *ngIf="stageProgress.get(stage)?.completed"></i>
+              <i class="pi pi-spin pi-spinner" *ngIf="stageProgress.get(stage)?.inProgress && !stageProgress.get(stage)?.completed"></i>
+              <span *ngIf="!stageProgress.get(stage)?.inProgress && !stageProgress.get(stage)?.completed">{{ i + 1 }}</span>
+            </div>
+            <div class="stage-title">
+              <h3>{{ getStageLabel(stage) }}</h3>
+              <span class="stage-status" 
+                    [class.status-completed]="stageProgress.get(stage)?.completed"
+                    [class.status-active]="stageProgress.get(stage)?.inProgress">
+                {{ stageProgress.get(stage)?.completed ? 'Completed' : (stageProgress.get(stage)?.inProgress ? 'In Progress' : 'Pending') }}
+              </span>
+            </div>
+          </div>
+
+          <div class="stage-card-body">
+            <div class="metrics-row">
+              <div class="metric-box">
+                <span class="metric-label">Input</span>
+                <span class="metric-value">{{ stageProgress.get(stage)?.inputQty | number:'1.0-2' }}</span>
+              </div>
+              <div class="metric-box">
+                <span class="metric-label">Processed</span>
+                <span class="metric-value">{{ stageProgress.get(stage)?.outputQty | number:'1.0-2' }}</span>
+              </div>
+              <div class="metric-box">
+                <span class="metric-label">Remaining</span>
+                <span class="metric-value">{{ stageProgress.get(stage)?.balanceQty | number:'1.0-2' }}</span>
+              </div>
+            </div>
+
+            <div class="stage-progress">
+              <div class="progress-bar-mini">
+                <div class="progress-fill-mini" 
+                     [style.width.%]="stageProgress.get(stage)?.outputQty && stageProgress.get(stage)?.inputQty ? (stageProgress.get(stage)!.outputQty / stageProgress.get(stage)!.inputQty * 100) : 0">
+                </div>
+              </div>
+              <span class="progress-text">
+                {{ stageProgress.get(stage)?.outputQty && stageProgress.get(stage)?.inputQty ? (stageProgress.get(stage)!.outputQty / stageProgress.get(stage)!.inputQty * 100 | number:'1.0-0') : 0 }}% Complete
+              </span>
+            </div>
+
+            <div class="stage-actions">
+              <button 
+                *ngIf="canExecuteStage(stage)"
+                class="btn-stage-primary"
+                (click)="openStageDialog(stage)">
+                <i class="pi pi-play-circle"></i>
+                Execute
+              </button>
+              <button 
+                *ngIf="canCancelStage(stage)"
+                class="btn-stage-secondary"
+                (click)="cancelLastStage(stage)">
+                <i class="pi pi-times-circle"></i>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Material Consumption Section -->
+    <div class="section materials-section">
+      <div class="section-header">
+        <h2><i class="pi pi-th-large"></i> Material Consumption</h2>
+      </div>
+
+      <div class="modern-table-container">
+        <table class="modern-table">
+          <thead>
+            <tr>
+              <th class="cell-index">S.NO.</th>
+              <th class="cell-material">MATERIAL NAME</th>
+              <th class="cell-quantity">QUANTITY USED</th>
+              <th class="cell-wastage">WASTAGE</th>
+              <th class="cell-timestamp">TIMESTAMP</th>
+            </tr>
+          </thead>
+          <tbody *ngIf="materialUsages.length > 0">
+            <tr *ngFor="let material of materialUsages; let i = index">
+              <td class="cell-index">{{ i + 1 }}</td>
+              <td class="cell-material">
+                <div class="material-info">
+                  <i class="pi pi-box material-icon"></i>
+                  <span class="material-name">{{ material.materialName }}</span>
+                </div>
+              </td>
+              <td class="cell-quantity">
+                <span class="quantity-value">{{ material.qtyUsed | number:'1.0-2' }}</span>
+              </td>
+              <td class="cell-wastage">
+                <span class="wastage-value" [class.has-wastage]="material.wastage > 0">
+                  {{ material.wastage | number:'1.0-2' }}
+                </span>
+              </td>
+              <td class="cell-timestamp">
+                <div class="timestamp-info">
+                  <i class="pi pi-calendar"></i>
+                  <span>{{ material.timestamp | date:'MMM d, yyyy, h:mm a' }}</span>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+          <tbody *ngIf="materialUsages.length === 0">
+            <tr>
+              <td colspan="5" class="empty-state-cell">
+                <div class="empty-state-content">
+                  <i class="pi pi-inbox"></i>
+                  <p>No materials consumed yet</p>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- Execute Stage Dialog -->
+<p-dialog 
+  [(visible)]="showStageDialog" 
+  [modal]="true"
+  [style]="{width: '540px'}"
+  [draggable]="false"
+  [resizable]="false"
+  styleClass="stage-dialog">
+  <ng-template pTemplate="header">
+    <div class="dialog-title">
+      <i class="pi pi-play-circle"></i>
+      <h3>Execute {{ getStageLabel(selectedStage) }}</h3>
+    </div>
+  </ng-template>
+  
+  <div class="dialog-content">
+    <div class="info-card">
+      <div class="info-item">
+        <span class="info-label">Product</span>
+        <span class="info-value">{{ order?.productName }}</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Start Date</span>
+        <span class="info-value">{{ order?.startDate | date:'MMMM d, yyyy' }}</span>
+      </div>
+      <div class="info-item" *ngIf="order?.endDate">
+        <span class="info-label">End Date</span>
+        <span class="info-value">{{ order?.endDate | date:'MMMM d, yyyy' }}</span>
+      </div>
+      <div class="info-item" *ngIf="selectedStage">
+        <span class="info-label">Input Quantity</span>
+        <span class="info-value highlight">{{ stageProgress.get(selectedStage)?.inputQty | number:'1.0-2' }}</span>
+      </div>
+      <div class="info-item" *ngIf="selectedStage">
+        <span class="info-label">Remaining</span>
+        <span class="info-value highlight">{{ stageProgress.get(selectedStage)?.balanceQty | number:'1.0-2' }}</span>
+      </div>
+    </div>
+
+    <div class="form-group" *ngIf="selectedStage && selectedStage !== ProductionStage.SEALING">
+      <label class="form-label">
+        Quantity to Process
+        <span class="required">*</span>
+      </label>
+      <p-inputNumber 
+        [(ngModel)]="processQuantity"
+        [min]="0"
+        mode="decimal"
+        [minFractionDigits]="2"
+        [maxFractionDigits]="2"
+        [showButtons]="true"
+        placeholder="Enter quantity">
+      </p-inputNumber>
+      <small class="form-hint">
+        <i class="pi pi-info-circle"></i>
+        Maximum: {{ getMaxProcessQuantity(selectedStage) | number:'1.0-2' }} units
+      </small>
+      <small class="error-hint" *ngIf="processQuantity && processQuantity > getMaxProcessQuantity(selectedStage)">
+        <i class="pi pi-exclamation-circle"></i>
+        Quantity cannot exceed {{ getMaxProcessQuantity(selectedStage) | number:'1.0-2' }} units
+      </small>
+    </div>
+
+    <div *ngIf="selectedStage === ProductionStage.SEALING" class="alert-info">
+      <i class="pi pi-info-circle"></i>
+      <span>SEALING stage will automatically process all available quantity</span>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="dialog-actions">
+      <button class="action-btn secondary" (click)="showStageDialog = false" [disabled]="executingStage">
+        <i class="pi pi-times"></i>
+        Cancel
+      </button>
+      <button class="action-btn primary" (click)="executeStage()" [disabled]="executingStage || (selectedStage !== ProductionStage.SEALING && (!processQuantity || processQuantity <= 0 || (selectedStage && processQuantity > getMaxProcessQuantity(selectedStage))))">
+        <i class="pi" [class.pi-spin]="executingStage" [class.pi-spinner]="executingStage" [class.pi-check]="!executingStage"></i>
+        {{ executingStage ? 'Executing...' : 'Execute Stage' }}
+      </button>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- Cancel Stage Dialog -->
+<p-dialog 
+  [(visible)]="showCancelDialog" 
+  [modal]="true"
+  [style]="{width: '450px'}"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="false"
+  styleClass="custom-confirm-dialog">
+  <ng-template pTemplate="header">
+    <h3>Confirm Delete</h3>
+  </ng-template>
+  
+  <div class="confirm-content">
+    <div class="warning-icon">
+      <i class="pi pi-exclamation-triangle"></i>
+    </div>
+    <p class="confirm-message">
+      Are you sure you want to cancel the last {{ getStageLabel(stageToCancel) }} execution? This will rollback all changes made in this stage.
+    </p>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="confirm-actions">
+      <button class="btn-confirm-no" (click)="showCancelDialog = false">
+        <i class="pi pi-times"></i>
+        No
+      </button>
+      <button class="btn-confirm-yes" (click)="confirmCancelStage()">
+        <i class="pi pi-check"></i>
+        Yes
+      </button>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<p-confirmDialog></p-confirmDialog>

@@ -1,0 +1,62 @@
+<div class="notification-panel" [class.visible]="visible" (click)="$event.stopPropagation()">
+  <div class="panel-header">
+    <h3>Notifications</h3>
+    <div class="header-actions">
+      <button pButton class="p-button-text p-button-sm" label="Mark all read" (click)="markAllAsRead()"></button>
+      <button pButton icon="pi pi-times" class="p-button-text p-button-rounded" (click)="closePanel()"></button>
+    </div>
+  </div>
+
+  <div class="panel-body">
+    <div *ngIf="notifications.length === 0" class="empty-state">
+      <i class="pi pi-bell" style="font-size: 3rem; color: #d1d5db;"></i>
+      <p>No notifications</p>
+    </div>
+
+    <div 
+      *ngFor="let notification of notifications" 
+      class="notification-item"
+      [class.unread]="!notification.read"
+      [ngClass]="getNotificationColor(notification.type)"
+      (click)="onNotificationClick(notification)">
+      
+      <div class="notification-icon">
+        <i class="pi" [ngClass]="getNotificationIcon(notification.type)"></i>
+      </div>
+
+      <div class="notification-content">
+        <div class="notification-header">
+          <h4>{{ notification.title }}</h4>
+          <span class="notification-time">{{ formatTime(notification.timestamp) }}</span>
+        </div>
+        <p class="notification-message">{{ notification.message }}</p>
+        <button 
+          *ngIf="notification.actionUrl" 
+          pButton 
+          label="View" 
+          class="p-button-sm p-button-text action-button"
+          (click)="onNotificationClick(notification)">
+        </button>
+      </div>
+
+      <button 
+        pButton 
+        icon="pi pi-times" 
+        class="p-button-text p-button-rounded p-button-sm remove-button"
+        (click)="removeNotification(notification, $event)">
+      </button>
+    </div>
+  </div>
+
+  <div class="panel-footer" *ngIf="notifications.length > 0">
+    <button 
+      pButton 
+      label="Clear All" 
+      icon="pi pi-trash"
+      class="p-button-text p-button-sm"
+      (click)="clearAll()">
+    </button>
+  </div>
+</div>
+
+<div class="notification-overlay" *ngIf="visible" (click)="closePanel()"></div>

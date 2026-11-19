@@ -1,0 +1,25 @@
+<div class="settings-page">
+  <header class="settings-header">
+    <div class="settings-header-icon">
+      <i class="pi pi-cog"></i>
+    </div>
+    <div>
+      <h1 class="settings-title">Settings</h1>
+      <p class="settings-subtitle">Manage product, production, and user configuration.</p>
+    </div>
+  </header>
+
+  <section class="settings-section" *ngFor="let category of categories">
+    <h2 class="section-title">{{ category }}</h2>
+    <div class="settings-grid">
+      <a class="settings-card" *ngFor="let option of optionsIn(category)" [routerLink]="option.route">
+        <span class="option-icon"><i [class]="option.icon"></i></span>
+        <span class="option-content">
+          <span class="option-title">{{ option.title }}</span>
+          <span class="option-description">{{ option.description }}</span>
+        </span>
+        <i class="pi pi-arrow-right option-arrow" aria-hidden="true"></i>
+      </a>
+    </div>
+  </section>
+</div>

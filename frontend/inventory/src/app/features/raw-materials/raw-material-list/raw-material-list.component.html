@@ -1,0 +1,107 @@
+<div class="raw-material-list-container">
+  <app-page-header
+    title="Raw Materials"
+    subtitle="Manage raw materials inventory"
+    icon="database"
+    [showAddButton]="true"
+    addButtonLabel="Add New"
+    (onAdd)="onAddRawMaterial()">
+    <div actions class="search-wrapper">
+      <i class="pi pi-search search-icon"></i>
+      <input 
+        type="text" 
+        [formControl]="searchControl"
+        placeholder="Search raw materials..." 
+        class="modern-search" />
+    </div>
+  </app-page-header>
+
+  <div class="table-wrapper">
+    <div class="modern-table-container">
+      <table class="modern-table">
+        <thead>
+          <tr>
+            <th class="col-sno">S.NO</th>
+            <th class="col-name">NAME</th>
+            <th class="col-cost">COST/UNIT</th>
+            <th class="col-purchase">PURCHASE UNIT</th>
+            <th class="col-consumption">CONSUMPTION UNIT</th>
+            <th class="col-conversion">CONVERSION FACTOR</th>
+            <th class="col-min-stock">MIN STOCK LEVEL</th>
+            <th class="col-status">STATUS</th>
+            <th class="col-actions">ACTIONS</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let rawMaterial of (filteredRawMaterials$ | async); let i = index" class="table-row">
+            <td class="cell-sno">
+              <span class="sno-text">{{ i + 1 }}</span>
+            </td>
+            
+            <td class="cell-name">
+              <div class="name-text">{{ rawMaterial.name }}</div>
+            </td>
+            
+            <td class="cell-cost">
+              <span class="cost-value">₹{{ rawMaterial.costPerUnit | number:'1.2-2' }}</span>
+            </td>
+            
+            <td class="cell-purchase">
+              <span class="unit-text">{{ rawMaterial.purchaseUnit }}</span>
+            </td>
+            
+            <td class="cell-consumption">
+              <span class="unit-text">{{ rawMaterial.consumptionUnit }}</span>
+            </td>
+            
+            <td class="cell-conversion">
+              <span class="conversion-value">{{ rawMaterial.conversionFactor | number:'1.0-0' }}</span>
+            </td>
+            
+            <td class="cell-min-stock">
+              <span class="stock-value">{{ rawMaterial.minStockLevel | number:'1.0-0' }}</span>
+            </td>
+            
+            <td class="cell-status">
+              <span class="status-indicator" [class.active]="rawMaterial.active" [class.inactive]="!rawMaterial.active">
+                <span class="status-dot"></span>
+                <span class="status-text">{{ rawMaterial.active ? 'Active' : 'Inactive' }}</span>
+              </span>
+            </td>
+            
+            <td class="cell-actions">
+              <div class="action-group">
+                <button class="btn-action btn-edit" (click)="onEdit(rawMaterial.id)" 
+                        pTooltip="Edit" tooltipPosition="top">
+                  <i class="pi pi-pencil"></i>
+                </button>
+                <button class="btn-action btn-delete" (click)="onDelete(rawMaterial)" 
+                        pTooltip="Delete" tooltipPosition="top">
+                  <i class="pi pi-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+
+          <tr *ngIf="(filteredRawMaterials$ | async)?.length === 0 && !(loading$ | async)" class="empty-row">
+            <td colspan="9">
+              <div class="empty-state">
+                <div class="empty-icon">
+                  <i class="pi pi-box"></i>
+                </div>
+                <h3 class="empty-title">No Raw Materials Found</h3>
+                <p class="empty-text">Get started by adding your first raw material</p>
+                <button class="btn-primary-empty" (click)="onAddRawMaterial()">
+                  <i class="pi pi-plus"></i>
+                  Add Raw Material
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<app-confirm-dialog></app-confirm-dialog>

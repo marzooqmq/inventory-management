@@ -1,0 +1,315 @@
+﻿<div class="report-container">
+  <app-page-header
+    title="Sales Report"
+    subtitle="Invoice-level transactions with customer, product & payment tracking"
+    icon="chart-line">
+    <div actions class="header-actions">
+      <button class="btn-outline-success"
+        [disabled]="loading || !data?.records?.length"
+        (click)="onExportCsv()"
+        pTooltip="Export current filtered data to CSV" tooltipPosition="bottom">
+        <i class="pi pi-file-excel"></i> Export CSV
+      </button>
+      <button class="btn-outline-primary"
+        [disabled]="loading || !data?.records?.length"
+        (click)="onDownloadPdf()"
+        pTooltip="Download PDF report for current filters" tooltipPosition="bottom">
+        <i class="pi pi-download"></i> Download PDF
+      </button>
+    </div>
+  </app-page-header>
+
+  <!-- â”€â”€ Filter Panel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+  <div class="filter-card">
+
+    <!-- Quick Presets Row -->
+    <div class="preset-bar">
+      <span class="preset-label">Period</span>
+      <div class="preset-pills">
+        <button *ngFor="let p of presets"
+          class="preset-pill"
+          [class.preset-active]="activePreset === p.key"
+          (click)="applyPreset(p.key)">
+          {{ p.label }}
+        </button>
+      </div>
+      <span class="date-range-display" *ngIf="dateRangeLabel">
+        <i class="pi pi-calendar"></i> {{ dateRangeLabel }}
+      </span>
+    </div>
+
+    <!-- Custom Date Range (shown only when custom preset is active) -->
+    <div class="custom-range-row" *ngIf="activePreset === 'custom'">
+      <div class="filter-item">
+        <label class="filter-label">Date Range</label>
+        <p-calendar [(ngModel)]="dateRange" selectionMode="range"
+          [readonlyInput]="true" placeholder="Select start â€“ end date"
+          dateFormat="dd/mm/yy" [showIcon]="true"
+          styleClass="w-full rpt-calendar">
+        </p-calendar>
+      </div>
+      <div class="filter-actions-inline">
+        <button class="btn-primary" (click)="onApplyFilters()"
+          [disabled]="!dateRange?.[0] || !dateRange?.[1]">
+          <i class="pi pi-search"></i> Apply
+        </button>
+      </div>
+    </div>
+
+    <!-- Refine Filters Row -->
+    <div class="filter-divider"></div>
+    <div class="filter-grid">
+
+      <div class="filter-item">
+        <label class="filter-label">Customer</label>
+        <p-dropdown [(ngModel)]="selectedCustomerId" [options]="customerOptions"
+          optionLabel="label" optionValue="value"
+          placeholder="All Customers" [filter]="true" filterBy="label"
+          styleClass="rpt-dropdown">
+        </p-dropdown>
+      </div>
+
+      <div class="filter-item">
+        <label class="filter-label">Product</label>
+        <p-dropdown [(ngModel)]="selectedProductId" [options]="productOptions"
+          optionLabel="label" optionValue="value"
+          placeholder="All Products" [filter]="true" filterBy="label"
+          styleClass="rpt-dropdown">
+        </p-dropdown>
+      </div>
+
+      <div class="filter-item">
+        <label class="filter-label">Payment Status</label>
+        <p-dropdown [(ngModel)]="selectedPaymentStatus" [options]="paymentStatusOptions"
+          optionLabel="label" optionValue="value"
+          placeholder="All Statuses"
+          styleClass="rpt-dropdown">
+        </p-dropdown>
+      </div>
+
+      <div class="filter-item">
+        <label class="filter-label">Invoice No.</label>
+        <input class="rpt-input" [(ngModel)]="invoiceNumber"
+          placeholder="e.g. KM2026010001"
+          (keyup.enter)="onApplyFilters()">
+      </div>
+
+      <div class="filter-actions">
+        <button class="btn-primary" (click)="onApplyFilters()">
+          <i class="pi pi-search"></i> Apply
+          <span class="filter-badge" *ngIf="activeFiltersCount > 0">{{ activeFiltersCount }}</span>
+        </button>
+        <button class="btn-ghost" (click)="onClearFilters()">
+          <i class="pi pi-times"></i> Clear All
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- â”€â”€ KPI Summary Cards â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+  <div class="kpi-row" *ngIf="!loading && data">
+    <div class="kpi-card kpi-blue">
+      <div class="kpi-icon"><i class="pi pi-file-invoice"></i></div>
+      <div class="kpi-body">
+        <div class="kpi-label">Total Invoices</div>
+        <div class="kpi-value">{{ data.totalInvoices | number }}</div>
+      </div>
+    </div>
+    <div class="kpi-card kpi-indigo">
+      <div class="kpi-icon"><i class="pi pi-box"></i></div>
+      <div class="kpi-body">
+        <div class="kpi-label">Total Boxes Sold</div>
+        <div class="kpi-value">{{ data.totalQuantityInBoxes | number }}</div>
+      </div>
+    </div>
+    <div class="kpi-card kpi-slate">
+      <div class="kpi-icon"><i class="pi pi-wallet"></i></div>
+      <div class="kpi-body">
+        <div class="kpi-label">Gross Sales</div>
+        <div class="kpi-value">{{ formatCurrency(data.grossAmount) }}</div>
+      </div>
+    </div>
+    <div class="kpi-card kpi-orange" *ngIf="data.discountAmount > 0">
+      <div class="kpi-icon"><i class="pi pi-tag"></i></div>
+      <div class="kpi-body">
+        <div class="kpi-label">Discount Given</div>
+        <div class="kpi-value">{{ formatCurrency(data.discountAmount) }}</div>
+      </div>
+    </div>
+    <div class="kpi-card kpi-cyan kpi-highlight">
+      <div class="kpi-icon"><i class="pi pi-chart-line"></i></div>
+      <div class="kpi-body">
+        <div class="kpi-label">Net Revenue</div>
+        <div class="kpi-value">{{ formatCurrency(data.netAmount) }}</div>
+      </div>
+    </div>
+    <div class="kpi-card kpi-green">
+      <div class="kpi-icon"><i class="pi pi-check-circle"></i></div>
+      <div class="kpi-body">
+        <div class="kpi-label">Amount Collected</div>
+        <div class="kpi-value">{{ formatCurrency(data.paidAmount) }}</div>
+      </div>
+    </div>
+    <div class="kpi-card kpi-red" *ngIf="data.balanceAmount > 0">
+      <div class="kpi-icon"><i class="pi pi-clock"></i></div>
+      <div class="kpi-body">
+        <div class="kpi-label">Balance Due</div>
+        <div class="kpi-value">{{ formatCurrency(data.balanceAmount) }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Skeleton KPIs -->
+  <div class="kpi-row" *ngIf="loading">
+    <div class="kpi-card kpi-skeleton" *ngFor="let i of [1,2,3,4,5,6]">
+      <p-skeleton width="100%" height="64px" borderRadius="10px"></p-skeleton>
+    </div>
+  </div>
+
+  <!-- â”€â”€ Data Table â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+  <div class="table-card">
+
+    <!-- Table Info Bar -->
+    <div class="table-info-bar" *ngIf="!loading">
+      <div class="info-left">
+        <span class="record-count" *ngIf="data">
+          <strong>{{ data.records.length }}</strong> of
+          <strong>{{ data.totalRecords | number }}</strong> records
+          <span class="page-info">Â· Page {{ page + 1 }} of {{ data.totalPages }}</span>
+        </span>
+        <span class="record-count no-data" *ngIf="!data">No data loaded</span>
+      </div>
+      <div class="info-right">
+        <span class="page-size-label">Rows per page</span>
+        <p-dropdown [(ngModel)]="pageSize" [options]="pageSizeOptions"
+          optionLabel="label" optionValue="value"
+          (onChange)="onPageSizeChange()"
+          styleClass="rpt-dropdown size-dropdown">
+        </p-dropdown>
+      </div>
+    </div>
+
+    <div class="table-scroll-wrapper">
+      <table class="rpt-table">
+        <thead>
+          <tr>
+            <th class="th-sno">#</th>
+            <th>INVOICE NO.</th>
+            <th>DATE</th>
+            <th>CUSTOMER</th>
+            <th>PRODUCT</th>
+            <th class="th-center">QTY</th>
+            <th class="th-center">UNIT</th>
+            <th class="th-right">BOXES</th>
+            <th class="th-right">RATE</th>
+            <th class="th-right">GROSS TOTAL</th>
+            <th class="th-right">NET AMT</th>
+            <th class="th-right">PAID</th>
+            <th class="th-right">BALANCE</th>
+            <th class="th-center">STATUS</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Skeleton rows -->
+          <ng-container *ngIf="loading">
+            <tr class="skeleton-row" *ngFor="let i of [1,2,3,4,5,6,7,8]">
+              <td *ngFor="let j of [1,2,3,4,5,6,7,8,9,10,11,12,13,14]">
+                <p-skeleton height="14px" borderRadius="4px"></p-skeleton>
+              </td>
+            </tr>
+          </ng-container>
+
+          <!-- Data rows -->
+          <tr *ngFor="let row of data?.records; let i = index" class="data-row">
+            <td class="td-sno">{{ page * pageSize + i + 1 }}</td>
+            <td>
+              <span class="invoice-no">{{ row.invoiceNumber }}</span>
+            </td>
+            <td class="td-date">{{ row.invoiceDate | date:'dd MMM yyyy' }}</td>
+            <td>
+              <span class="td-primary-text">{{ row.customerName }}</span>
+            </td>
+            <td>
+              <span class="td-muted-text">{{ row.productName }}</span>
+            </td>
+            <td class="td-center td-num">{{ row.quantity | number }}</td>
+            <td class="td-center">
+              <span class="unit-badge" [class.unit-case]="row.unitType === 'CASE'">{{ row.unitType }}</span>
+            </td>
+            <td class="td-right td-bold td-blue">{{ row.quantityInBoxes | number }}</td>
+            <td class="td-right td-mono td-muted">{{ formatCurrency(row.rate) }}</td>
+            <td class="td-right td-mono">{{ formatCurrency(row.total) }}</td>
+            <td class="td-right td-mono td-bold">{{ formatCurrency(row.netAmount) }}</td>
+            <td class="td-right td-mono td-green">{{ formatCurrency(row.paidAmount) }}</td>
+            <td class="td-right td-mono"
+                [class.td-red]="rowBalance(row) > 0"
+                [class.td-green]="rowBalance(row) === 0">
+              {{ rowBalance(row) > 0 ? formatCurrency(rowBalance(row)) : 'â€”' }}
+            </td>
+            <td class="td-center">
+              <span class="payment-badge" [ngClass]="paymentClass(row.paymentStatus)">
+                {{ paymentLabel(row.paymentStatus) }}
+              </span>
+            </td>
+          </tr>
+
+          <!-- Empty -->
+          <tr *ngIf="!loading && !data?.records?.length">
+            <td colspan="14" class="empty-row">
+              <div class="empty-state">
+                <div class="empty-icon"><i class="pi pi-inbox"></i></div>
+                <div class="empty-title">No records found</div>
+                <div class="empty-sub">Adjust filters or select a different period to load data.</div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+
+        <!-- Grand Totals Footer Row -->
+        <tfoot *ngIf="!loading && data?.records?.length">
+          <tr class="totals-row">
+            <td colspan="7" class="totals-label">
+              <i class="pi pi-calculator"></i> Grand Total
+              <span class="totals-note">(all {{ data!.totalRecords | number }} records)</span>
+            </td>
+            <td class="td-right td-totals-num">{{ data!.totalQuantityInBoxes | number }}</td>
+            <td class="td-right td-totals-dash">â€”</td>
+            <td class="td-right td-totals-num">{{ formatCurrency(data!.grossAmount) }}</td>
+            <td class="td-right td-totals-num">{{ formatCurrency(data!.netAmount) }}</td>
+            <td class="td-right td-totals-num td-green-strong">{{ formatCurrency(data!.paidAmount) }}</td>
+            <td class="td-right td-totals-num td-red-strong">{{ formatCurrency(data!.balanceAmount) }}</td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination-bar" *ngIf="data && data.totalPages > 1 && !loading">
+      <button class="page-btn" [disabled]="page === 0" (click)="goToPage(0)"
+        pTooltip="First page">
+        <i class="pi pi-angle-double-left"></i>
+      </button>
+      <button class="page-btn" [disabled]="page === 0" (click)="goToPage(page - 1)"
+        pTooltip="Previous page">
+        <i class="pi pi-angle-left"></i>
+      </button>
+      <ng-container *ngFor="let p of pages">
+        <button class="page-btn page-num"
+          [class.page-active]="p === page"
+          *ngIf="p >= page - 2 && p <= page + 2"
+          (click)="goToPage(p)">{{ p + 1 }}</button>
+      </ng-container>
+      <button class="page-btn" [disabled]="page === (data.totalPages - 1)" (click)="goToPage(page + 1)"
+        pTooltip="Next page">
+        <i class="pi pi-angle-right"></i>
+      </button>
+      <button class="page-btn" [disabled]="page === (data.totalPages - 1)" (click)="goToPage(data.totalPages - 1)"
+        pTooltip="Last page">
+        <i class="pi pi-angle-double-right"></i>
+      </button>
+    </div>
+
+  </div>
+</div>

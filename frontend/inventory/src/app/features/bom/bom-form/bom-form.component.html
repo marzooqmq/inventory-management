@@ -1,0 +1,103 @@
+<div class="bom-form-container">
+  <app-page-header
+    [title]="isEditMode ? 'Edit BOM' : 'Add New BOM'"
+    [subtitle]="isEditMode ? 'Update bill of material details' : 'Create a new bill of material'"
+    icon="list-check">
+  </app-page-header>
+
+  <div class="form-card">
+    <p-card>
+      <form [formGroup]="bomForm" (ngSubmit)="onSubmit()">
+        <div class="form-grid">
+          <!-- Product -->
+          <div class="form-field">
+            <label for="productId" class="field-label">
+              Product <span class="required">*</span>
+            </label>
+            <p-dropdown
+              id="productId"
+              formControlName="productId"
+              [options]="(products$ | async) || []"
+              optionLabel="name"
+              optionValue="id"
+              placeholder="Select product"
+              [showClear]="true"
+              [filter]="true"
+              filterBy="name"
+              [class.invalid]="isFieldInvalid('productId')">
+            </p-dropdown>
+            <small class="error-message" *ngIf="isFieldInvalid('productId')">
+              {{ getErrorMessage('productId') }}
+            </small>
+          </div>
+
+          <!-- Raw Material -->
+          <div class="form-field">
+            <label for="materialId" class="field-label">
+              Raw Material <span class="required">*</span>
+            </label>
+            <p-dropdown
+              id="materialId"
+              formControlName="materialId"
+              [options]="(rawMaterials$ | async) || []"
+              optionLabel="name"
+              optionValue="id"
+              placeholder="Select raw material"
+              [showClear]="true"
+              [filter]="true"
+              filterBy="name"
+              [class.invalid]="isFieldInvalid('materialId')">
+            </p-dropdown>
+            <small class="error-message" *ngIf="isFieldInvalid('materialId')">
+              {{ getErrorMessage('materialId') }}
+            </small>
+          </div>
+
+          <!-- Quantity Required -->
+          <div class="form-field full-width">
+            <label for="qtyRequired" class="field-label">
+              Quantity Required <span class="required">*</span>
+            </label>
+            <p-inputNumber
+              id="qtyRequired"
+              formControlName="qtyRequired"
+              [min]="0.01"
+              [minFractionDigits]="0"
+              [maxFractionDigits]="2"
+              [showButtons]="true"
+              placeholder="Enter quantity required"
+              [class.invalid]="isFieldInvalid('qtyRequired')">
+            </p-inputNumber>
+            <small class="field-help">Quantity of raw material required per product unit</small>
+            <small class="error-message" *ngIf="isFieldInvalid('qtyRequired')">
+              {{ getErrorMessage('qtyRequired') }}
+            </small>
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <button
+            pButton
+            pRipple
+            type="button"
+            label="Cancel"
+            icon="pi pi-times"
+            class="p-button-text p-button-secondary"
+            (click)="onCancel()">
+          </button>
+          <button
+            pButton
+            pRipple
+            type="submit"
+            [label]="isEditMode ? 'Update BOM' : 'Create BOM'"
+            icon="pi pi-check"
+            class="p-button-primary"
+            [loading]="(loading$ | async) ?? false"
+            [disabled]="bomForm.invalid">
+          </button>
+        </div>
+      </form>
+    </p-card>
+  </div>
+</div>
